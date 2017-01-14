@@ -1,0 +1,121 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block sidebarMenuAdminActive %}active{% endblock %}
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+{% block extendCss %}
+    <style>select {
+            min-width: 230px;
+        }
+
+        td {
+            text-align: center
+        }
+
+        th {
+            text-align: center
+        }</style>
+{% endblock %}
+{% block extendJsBottom %}
+    {#<script src="{{ asset('bundles/awhscore/js/plugins/datatables/jquery.dataTables.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('bundles/awhscore/js/plugins/datatables/dataTables.bootstrap.js') }}" type="text/javascript"></script>
+    <script type="text/javascript">
+                $(function() {
+                    //$("#example1").dataTable();
+                    $('#iptable').dataTable({
+                        "bPaginate": true,
+                        "bLengthChange": false,
+                        "bFilter": false,
+                        "bSort": true,
+                        "bInfo": true,
+                        "bAutoWidth": false
+                    });
+                });
+            </script>#}
+    <script language="JavaScript" type="text/javascript">
+        $(document).ready(function () {
+            $('#add').click(function () {
+                return !$('#selAvailable option:selected').remove().appendTo('#selAvailableVPS');
+            });
+            $('#remove').click(function () {
+                return !$('#selAvailableVPS option:selected').remove().appendTo('#selAvailable');
+            });
+
+            $('#changeIP').submit(function () {
+                $('#selAvailableVPS option').each(function (i) {
+                    $(this).attr("selected", "selected");
+                });
+                $('#selAvailable option').each(function (i) {
+                    $(this).attr("selected", "selected");
+                });
+                //return false;
+            });
+        });
+    </script>
+{% endblock %}
+{% block contentHeader %}
+    <h1>
+        Gestion des adresses IPs
+        <small>Control panel</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="{{ path('awhs_services_homepage') }}"><i class="fa fa-dashboard"></i> Services</a></li>
+        <li class="active"><i class="fa "></i>Gestion des adresses IPs</li>
+    </ol>
+{% endblock %}
+{% block sidebarMenuMore %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box">
+                <div class="box-body table-responsive table-stripped no-padding">
+                    <table id="iptable" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>IP</th>
+                            <th>Reverse</th>
+                            <th>Serveur</th>
+                            <th>Pays</th>
+                            <th>Active</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for ip in ips %}
+                            <tr>
+                                <td>{{ ip.ip }}</td>
+                                <td>{{ ip.reverse }}</td>
+                                <td>{{ ip.server.name }}</td>
+                                <td>{{ ip.country.name }}</td>
+                                <td>
+                                    {% if ip.active == 0 %}
+                                        <span class="label label-danger">Inactif</span>
+                                    {% else %}
+                                        <span class="label label-success">Actif</span>
+                                        {% if ip.service.id is defined %}
+                                            <br>
+                                            {{ ip.service.id }}
+                                        {% endif %}
+                                        {% if ip.user.username is defined %}
+                                            ({{ ip.user.username }})
+                                        {% endif %}
+
+                                    {% endif %}
+                                </td>
+                                <td><a href="{{ path('awhs_admin_manage_ip', {'id':ip.id}) }}"><img
+                                                src="{{ asset('bundles/awhscore/img/awhs/find.png') }}"></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+
+    <!-- JavaScripts -->
+
+{% endblock %}

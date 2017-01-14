@@ -1,0 +1,27 @@
+{% set form_fields_settings = attribute(item.settings, index_package) %}
+<h4>Configuration de {{ product.name }}</h4>
+<div>
+    {% for field in settings.form_fields %}
+        {% if field.name == "os" %}
+            <div class="form-group">
+                <label>{{ field.label }}:</label>
+                <select class="form-control" id="{{ field.name }}"
+                        name="{{ item.secure_id }}[{{ index_package }}][{{ index }}][{{ field.name }}]"
+                        {% if field.required == true %}required="required"{% endif %} >
+                    {% for template in product.category.settingsArray.templates %}
+                        <option value="{{ template.value }}">{{ template.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% else %}
+            <div class="form-group">
+                <label>{{ field.label }}:</label>
+                <input type="text" id="{{ field.name }}"
+                       name="{{ item.secure_id }}[{{ index_package }}][{{ index }}][{{ field.name }}]"
+                       {% if field.required == true %}required="required"{% endif %} {% if field.pattern is defined %}pattern="{{ field.pattern }}"{% endif %}
+                       class="form-control" {% if field.placeholder is defined %}placeholder="{{ field.placeholder }}"{% endif %}
+                       value="{% if attribute(attribute(form_fields_settings, index), field.name) is defined %}{{ attribute(attribute(form_fields_settings, index), field.name) }}{% endif %}">
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>

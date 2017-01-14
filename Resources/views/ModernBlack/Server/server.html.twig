@@ -1,0 +1,783 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - {{ server.reverse }}{% endblock %}
+
+{% macro bytesToSize(bytes) %}
+    {% spaceless %}
+        {% set kilobyte = 1024 %}
+        {% set megabyte = kilobyte * 1024 %}
+        {% set gigabyte = megabyte * 1024 %}
+        {% set terabyte = gigabyte * 1024 %}
+
+        {% if bytes == '' %}
+            {% set bytes = 0 %}
+        {% endif %}
+
+        {% if bytes < kilobyte %}
+            {{ bytes ~ ' B' }}
+        {% elseif bytes < megabyte %}
+            {{ (bytes / kilobyte)|number_format(2, '.') ~ ' KB' }}
+        {% elseif bytes < gigabyte %}
+            {{ (bytes / megabyte)|number_format(2, '.') ~ ' MB' }}
+        {% elseif bytes < terabyte %}
+            {{ (bytes / gigabyte)|number_format(2, '.') ~ ' GB' }}
+        {% else %}
+            {{ (bytes / terabyte)|number_format(2, '.') ~ ' TB' }}
+        {% endif %}
+    {% endspaceless %}
+{% endmacro %}
+
+{% block extendCss %}
+    <style>
+        .progress-bar {
+            color: #F5F5F5
+        }
+
+        thead {
+            background: #d6dadf url(bg_button.png) repeat-x;
+            -webkit-background-size: 100% 100%;
+            -moz-background-size: 100% 100%;
+            -o-background-size: 100% 100%;
+            background-size: 100% 100%;
+            background: -webkit-gradient(linear, left top, left bottom, from(#efeff4), to(#d6dadf));
+            background: -webkit-linear-gradient(top, #efeff4, #d6dadf);
+            background: -moz-linear-gradient(top, #efeff4, #d6dadf);
+            background: -ms-linear-gradient(top, #efeff4, #d6dadf);
+            background: -o-linear-gradient(top, #efeff4, #d6dadf);
+            background: linear-gradient(top, #efeff4, #d6dadf);
+            border-color: #ccc;
+            color: #555;
+        }
+
+        .progress {
+            height: 20px
+        }
+
+        .modern-black-admin .progress-bar {
+            background: #93A1AB;
+            border-color: #929292;
+        }
+        canvas {
+            /*pointer-events: none;*/
+            width: 100% !important;
+            height: auto !important;
+
+        }
+    </style>{% endblock %}
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+{% block fastNavigation %}{% endblock %}
+{% block pageHeader %}{% endblock %}
+
+
+{% block sidebarMenuMore %}{% include 'AWHSCoreBundle:'~awhs.template~'/Server:left_menu.html.twig' with {'server': server} %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Informations générales</h3>
+                </div><!-- /.box-header -->
+                <div class="">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title">General</h3>
+                                </div><!-- /.box-header -->
+                                <div class="">
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <td style="width: 200px;">CPU</td>
+                                            <td>{{ serverInfos.cpu.model }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>OS</td>
+                                            <td>{{ serverInfos.os.name }} ({{ serverInfos.os.version }})</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Uptime</td>
+                                            <td>{{ serverInfos.uptime }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title">CPU usage</h3>
+                                </div><!-- /.box-header -->
+                                <div class="">
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <td style="width: 200px;">Last 1 minute</td>
+                                            <td>{{ serverInfos.loadAverage[0] }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Last 5 minutes</td>
+                                            <td>{{ serverInfos.loadAverage[1] }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Last 15 minutes</td>
+                                            <td>{{ serverInfos.loadAverage[2] }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title">Load Average</h3>
+                                </div><!-- /.box-header -->
+                                <div style="height:300px">
+                                    <canvas id="chartContainerLavg" height="300">
+                                    </canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title">Memory (MB)</h3>
+                                </div><!-- /.box-header -->
+                                <div style="height:300px">
+                                    <canvas id="chartContainerRam" height="300">
+                                    </canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title">Network (kB/s)</h3>
+                                </div><!-- /.box-header -->
+                                <div style="height:300px">
+                                    <canvas id="chartContainerNetwork" height="300">
+                                    </canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title">Network Usage</h3>
+                                </div><!-- /.box-header -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>Interface</th>
+                                            <th>Transmitted Packets</th>
+                                            <th>Received Packets</th>
+                                            <th>Transmitted Bytes</th>
+                                            <th>Received Bytes</th>
+                                            <th>MTU</th>
+                                        </tr>
+                                        </thead>
+                                        {% for interface in serverInfos.interfaces %}
+                                            <tr>
+                                                <td>{{ interface.name }}</td>
+                                                <td>{{ interface.network.tx_packets }}</td>
+                                                <td>{{ interface.network.rx_packets }}</td>
+                                                <td>{{ interface.network.tx_bytes }}
+                                                    ({{ _self.bytesToSize(interface.network.tx_bytes) }})
+                                                </td>
+                                                <td>{{ interface.network.rx_bytes }}
+                                                    ({{ _self.bytesToSize(interface.network.rx_bytes) }})
+                                                </td>
+                                                <td>{{ interface.network.mtu }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title">Memory Usage</h3>
+                                </div><!-- /.box-header -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>Total</th>
+                                            <th>Used</th>
+                                            <th>Free</th>
+                                            <th>Shared</th>
+                                            <th>Buffer</th>
+                                            <th>Cached</th>
+                                            <th>Usage</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>{{ _self.bytesToSize(serverInfos.memoryUsage.MemTotal) }}</td>
+                                            <td>{{ _self.bytesToSize(serverInfos.memoryUsage.MemTotal-serverInfos.memoryUsage.MemFree) }}</td>
+                                            <td>{{ _self.bytesToSize(serverInfos.memoryUsage.MemFree) }}</td>
+                                            <td>{{ _self.bytesToSize(serverInfos.memoryUsage.Shared) }}</td>
+                                            <td>{{ _self.bytesToSize(serverInfos.memoryUsage.Buffer) }}</td>
+                                            <td>{{ _self.bytesToSize(serverInfos.memoryUsage.Cached) }}</td>
+                                            <td>
+                                                {% set usedMemory = ((serverInfos.memoryUsage.MemTotal-serverInfos.memoryUsage.MemFree)*100)/(serverInfos.memoryUsage.MemTotal) %}
+                                                <div class="progress">
+                                                    <div class="progress-bar" role="progressbar"
+                                                         aria-valuenow="{{ usedMemory }}"
+                                                         aria-valuemin="0" aria-valuemax="100"
+                                                         style="width: {{ usedMemory }}%;">
+                                                        {{ usedMemory|round }}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title">Swap Usage</h3>
+                                </div><!-- /.box-header -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>Total</th>
+                                            <th>Used</th>
+                                            <th>Free</th>
+                                            <th>Usage</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>{{ _self.bytesToSize(serverInfos.memoryUsage.SwapTotal) }}</td>
+                                            <td>{{ _self.bytesToSize(serverInfos.memoryUsage.SwapTotal-serverInfos.memoryUsage.SwapFree) }}</td>
+                                            <td>{{ _self.bytesToSize(serverInfos.memoryUsage.SwapFree) }}</td>
+                                            <td>
+                                                {% if serverInfos.memoryUsage.SwapTotal != 0 %}
+                                                    {% set usedSwap = ((serverInfos.memoryUsage.SwapTotal-serverInfos.memoryUsage.SwapFree)*100)/(serverInfos.memoryUsage.SwapTotal) %}
+                                                    <div class="progress">
+                                                        <div class="progress-bar" role="progressbar"
+                                                             aria-valuenow="{{ usedSwap }}"
+                                                             aria-valuemin="0" aria-valuemax="100"
+                                                             style="width: {{ usedSwap }}%;">
+                                                            {{ usedSwap|round }}%
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title">Disk Usage</h3>
+                                </div><!-- /.box-header -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>File system</th>
+                                            <th>Total</th>
+                                            <th>Used</th>
+                                            <th>Available</th>
+                                            <th>Capacity</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for disk in serverInfos.diskUsage %}
+                                            <tr>
+                                                <td>{{ disk.fileSystem }} ( {{ disk.mount }} )</td>
+                                                <td>{{ _self.bytesToSize(disk.total) }}</td>
+                                                <td>{{ _self.bytesToSize(disk.used) }}</td>
+                                                <td>{{ _self.bytesToSize(disk.free) }}</td>
+                                                <td>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" role="progressbar"
+                                                             aria-valuenow="{{ disk.percent }}"
+                                                             aria-valuemin="0" aria-valuemax="100"
+                                                             style="width: {{ disk.percent }}%;">
+                                                            {{ disk.percent }}%
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title">Processes <span onclick="getProcesses()"
+                                                                          class="btn btn-primary btn-primary-shaddow btn-labeled btn-label icon fa fa-refresh"
+                                                                          style="font-size:11px;line-height: 5px;"></span>
+                                    </h3>
+                                </div><!-- /.box-header -->
+                                <div class="table-responsive">
+                                    <table id="processes" class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>USER</th>
+                                            <th>PID</th>
+                                            <th>%CPU</th>
+                                            <th>%MEM</th>
+                                            <th>VSZ</th>
+                                            <th>RSS</th>
+                                            <th>TTY</th>
+                                            <th>STAT</th>
+                                            <th>START</th>
+                                            <th>TIME</th>
+                                            <th>COMMAND</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div><!-- /.-->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+    <!-- JavaScripts -->
+
+{% endblock %}
+{% block extendJs %}
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <script type="text/javascript">
+        Date.prototype.timeNow = function () {
+            return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
+        }
+
+        var updateInterval = 30000;
+        function chartLavgSetup() {
+            var data = {
+                datasets : [
+                    {
+                        label: "1m",
+                        backgroundColor : "rgba(220,220,220,0.5)",
+                        strokeColor : "rgba(220,220,220,1)",
+                        pointColor : "rgba(220,220,220,1)",
+                        pointStrokeColor : "#fff",
+                        
+                    },
+                    {
+                        label: "5m",
+                        backgroundColor: "rgba(151,187,205,0.2)",
+                        strokeColor: "rgba(151,187,205,1)",
+                        pointColor: "rgba(151,187,205,1)",
+                        pointStrokeColor : "#fff",
+                        
+                    },
+                    {
+                        label: "15m",
+                        backgroundColor: "rgba(240,73,73,0.2)",
+                        strokeColor: "rgba(240,73,73,1)",
+                        pointColor: "rgba(240,73,73,1)",
+                        pointStrokeColor : "#fff",
+                        
+                    }
+                ]
+            }
+            // this is ugly, don't judge me
+            var updateData = function(oldData){
+                var labels = oldData["labels"];
+                var dataSetA = oldData["datasets"][0]["data"];
+                var dataSetB = oldData["datasets"][1]["data"];
+                var dataSetC = oldData["datasets"][2]["data"];
+
+//                labels.shift();
+                var d = new Date();
+
+                $.getJSON("{{ path('awhs_admin_server_json', {server_hostname:server.reverse}) }}?datas=lavg", function (data) {
+                    labels.push(new Date().timeNow());
+                    dataSetA.push(data[0]);
+                    dataSetB.push(data[1]);
+                    dataSetC.push(data[2]);
+//                    dataSetA.shift();
+                });
+
+            };
+
+            var optionsAnimation = {
+                //Boolean - If we want to override with a hard coded scale
+                scaleOverride : true,
+                //** Required if scaleOverride is true **
+                //Number - The number of steps in a hard coded scale
+                scaleSteps : 10,
+                //Number - The value jump in the hard coded scale
+                scaleStepWidth : 10,
+                //Number - The scale starting value
+                scaleStartValue : 0,
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    /*
+                     xAxes: [{
+                     ticks: {
+                     autoSkip:true,
+                     maxTicksLimit:3
+                     }
+                     }]
+                     */
+                    xAxes: [{
+                        afterTickToLabelConversion: function(data){
+                            var xLabels = data.ticks;
+                            var modVal = Math.ceil( xLabels.length / 10)
+
+                            xLabels.forEach(function (label, i)
+                            {
+                                if (i % modVal != 0)
+                                    xLabels[i] = '';
+                            })
+                        }
+                    }]
+                }
+            }
+
+            // Not sure why the scaleOverride isn't working...
+            var optionsNoAnimation = {
+                animation : false,
+                //Boolean - If we want to override with a hard coded scale
+                scaleOverride : true,
+                //** Required if scaleOverride is true **
+                //Number - The number of steps in a hard coded scale
+                scaleSteps : 20,
+                //Number - The value jump in the hard coded scale
+                scaleStepWidth : 10,
+                //Number - The scale starting value
+                scaleStartValue : 0,
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+
+            //Get the context of the canvas element we want to select
+            var ctx = document.getElementById("chartContainerLavg").getContext("2d");
+            var myNewChart = new Chart(ctx,
+                {
+                    type: "line",
+                    data: data,
+                    options: optionsAnimation
+                });
+
+            setInterval(function(){
+                updateData(data);
+                myNewChart.update()
+                ;}, updateInterval
+            );
+        }
+
+        function chartRamSetup() {
+            var data = {
+                datasets : [
+//                    {
+//                        label: "Free",
+//                        backgroundColor : "rgba(220,220,220,0.5)",
+//                        strokeColor : "rgba(220,220,220,1)",
+//                        pointColor : "rgba(220,220,220,1)",
+//                        pointStrokeColor : "#fff",
+//
+//                    },
+                    {
+                        label: "Used",
+                        backgroundColor: "rgba(151,187,205,0.2)",
+                        strokeColor: "rgba(151,187,205,1)",
+                        pointColor: "rgba(151,187,205,1)",
+                        pointStrokeColor : "#fff",
+                        
+                    },
+//                    {
+//                        label: "Total",
+//                        backgroundColor: "rgba(240,73,73,0.2)",
+//                        strokeColor: "rgba(240,73,73,1)",
+//                        pointColor: "rgba(240,73,73,1)",
+//                        pointStrokeColor : "#fff",
+//
+//                    }
+                ]
+            }
+            // this is ugly, don't judge me
+            var updateData = function(oldData){
+                var labels = oldData["labels"];
+//                var dataSetA = oldData["datasets"][0]["data"];
+                var dataSetB = oldData["datasets"][0]["data"];
+//                var dataSetC = oldData["datasets"][2]["data"];
+
+//                labels.shift();
+                var d = new Date();
+
+                $.getJSON("{{ path('awhs_admin_server_json', {server_hostname:server.reverse}) }}?datas=memory", function (data) {
+                    labels.push(new Date().timeNow());
+
+//                    dataSetA.push(Math.round((data.MemFree)/1024/1024/1024,2));
+                    dataSetB.push(((data.MemTotal-data.MemFree)/1024/1024/1024).toFixed(2));
+//                    dataSetC.push(Math.round(data.MemTotal/1024/1024/1024,2));
+//                    dataSetA.shift();
+                });
+
+            };
+
+            var optionsAnimation = {
+                //Boolean - If we want to override with a hard coded scale
+                scaleOverride : true,
+                //** Required if scaleOverride is true **
+                //Number - The number of steps in a hard coded scale
+                scaleSteps : 10,
+                //Number - The value jump in the hard coded scale
+                scaleStepWidth : 10,
+                //Number - The scale starting value
+                scaleStartValue : 0,
+
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    /*
+                     xAxes: [{
+                     ticks: {
+                     autoSkip:true,
+                     maxTicksLimit:3
+                     }
+                     }]
+                     */
+                    xAxes: [{
+                        afterTickToLabelConversion: function(data){
+                            var xLabels = data.ticks;
+                            var modVal = Math.ceil( xLabels.length / 10)
+
+                            xLabels.forEach(function (label, i)
+                            {
+                                if (i % modVal != 0)
+                                    xLabels[i] = '';
+                            })
+                        }
+                    }]
+                }
+            }
+
+            // Not sure why the scaleOverride isn't working...
+            var optionsNoAnimation = {
+                animation : false,
+                //Boolean - If we want to override with a hard coded scale
+                scaleOverride : true,
+                //** Required if scaleOverride is true **
+                //Number - The number of steps in a hard coded scale
+                scaleSteps : 20,
+                //Number - The value jump in the hard coded scale
+                scaleStepWidth : 10,
+                //Number - The scale starting value
+                scaleStartValue : 0,
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+
+            //Get the context of the canvas element we want to select
+            var ctx = document.getElementById("chartContainerRam").getContext("2d");
+            var myNewChart = new Chart(ctx,
+                {
+                    type: "line",
+                    data: data,
+                    options: optionsAnimation
+                });
+
+            setInterval(function(){
+                updateData(data);
+                myNewChart.update()
+                ;}, updateInterval
+            );
+
+        }
+
+        function chartNetworkSetup() {
+            var data = {
+                datasets : [
+                    {
+                        label: "In",
+                        backgroundColor: "rgba(151,187,205,0.2)",
+                        strokeColor: "rgba(151,187,205,1)",
+                        pointColor: "rgba(151,187,205,1)",
+                        pointStrokeColor : "#fff",
+                        radius: 0,
+                    },
+                    {
+                        label: "Out",
+                        backgroundColor: "rgba(240,73,73,0.2)",
+                        strokeColor: "rgba(240,73,73,1)",
+                        pointColor: "rgba(240,73,73,1)",
+                        pointStrokeColor : "#fff",
+                        radius: 0,
+                    }
+                ]
+            }
+            // this is ugly, don't judge me
+            var updateData = function(oldData){
+                var labels = oldData["labels"];
+                var dataSetA = oldData["datasets"][0]["data"];
+                var dataSetB = oldData["datasets"][1]["data"];
+
+//                labels.shift();
+                var d = new Date();
+
+                $.getJSON("{{ path('awhs_admin_server_json', {server_hostname:server.reverse}) }}?datas=network", function (data) {
+                    labels.push(new Date().timeNow());
+
+                    var netin = 0;
+                    var netout = 0;
+                    $.each(data, function (key, val) {
+                        $.each(val, function (key2, val3) {
+                            if(data[key]['name'] != "lo"){
+                                netin = data[key]['network']['l_rx_bytes'];
+//                                console.log('in: ' + netin);
+                                netout = data[key]['network']['l_tx_bytes'];
+//                                console.log('out: ' + netout);
+                            }
+                        });
+                    });
+
+                    dataSetA.push(Math.round((netin/1024),2));
+                    dataSetB.push(Math.round((netout/1024),2));
+//                    dataSetA.shift();
+//                    if(labels.length > 10){
+//                        labels.shift();
+//                        dataSetA.shift();
+//                        dataSetB.shift();
+//                    }
+
+                });
+
+            };
+
+            var optionsAnimation = {
+                //Boolean - If we want to override with a hard coded scale
+                scaleOverride : true,
+                //** Required if scaleOverride is true **
+                //Number - The number of steps in a hard coded scale
+                scaleSteps : 10,
+                //Number - The value jump in the hard coded scale
+                scaleStepWidth : 10,
+                //Number - The scale starting value
+                scaleStartValue : 0,
+
+                responsive: true,
+                maintainAspectRatio: false,
+
+                scales: {
+                    /*
+                     xAxes: [{
+                     ticks: {
+                     autoSkip:true,
+                     maxTicksLimit:3
+                     }
+                     }]
+                     */
+                    xAxes: [{
+                        afterTickToLabelConversion: function(data){
+                            var xLabels = data.ticks;
+                            var modVal = Math.ceil( xLabels.length / 10)
+
+                            xLabels.forEach(function (label, i)
+                            {
+                                if (i % modVal != 0)
+                                    xLabels[i] = '';
+                            })
+                        }
+                    }]
+                }
+
+            }
+
+            // Not sure why the scaleOverride isn't working...
+            var optionsNoAnimation = {
+                animation : false,
+                //Boolean - If we want to override with a hard coded scale
+                scaleOverride : true,
+                //** Required if scaleOverride is true **
+                //Number - The number of steps in a hard coded scale
+                scaleSteps : 20,
+                //Number - The value jump in the hard coded scale
+                scaleStepWidth : 10,
+                //Number - The scale starting value
+                scaleStartValue : 0,
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+
+            //Get the context of the canvas element we want to select
+            var ctx = document.getElementById("chartContainerNetwork").getContext("2d");
+            var myNewChart = new Chart(ctx,
+                {
+                    type: "line",
+                    data: data,
+                    options: optionsAnimation
+                });
+
+            setInterval(function(){
+                updateData(data);
+                myNewChart.update();
+                }, 5000
+            );
+
+        }
+    </script>
+    <script>
+        function getProcesses() {
+            $.getJSON("{{ path('awhs_admin_server_processes_json', {server_hostname:server.reverse}) }}", function (data) {
+
+                var items = [];
+                $.each(data, function (key, val) {
+//                    console.log(key + " -> " + val);
+                    items.push("<tr>\
+                            <td>" + val.USER + "</td>\
+                            <td>" + val.PID + "</td>\
+                            <td>" + val.CPU + "</td>\
+                            <td>" + val.MEM + "</td>\
+                            <td>" + val.VSZ + "</td>\
+                            <td>" + val.RSS + "</td>\
+                            <td>" + val.TTY + "</td>\
+                            <td>" + val.STAT + "</td>\
+                            <td>" + val.START + "</td>\
+                            <td>" + val.TIME + "</td>\
+                            <td>" + val.COMMAND + "</td>\
+                           </tr> ");
+                });
+                $("#processes > tbody").empty();
+                for (i = 0; i <= items.length - 1; i++) {12
+                    $("#processes > tbody").append(items[i]);
+                }
+            });
+        }
+        $(document).ready(function () {
+            getProcesses();
+            chartRamSetup();
+            chartLavgSetup();
+            chartNetworkSetup();
+        });
+
+    </script>
+
+
+{% endblock %}

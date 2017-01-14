@@ -1,0 +1,225 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - Produit {{ product.name }}{% endblock %}
+
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+{% block sidebarMenuDashboardActive %} active{% endblock %}
+
+{% block extendJs %}
+    <script src="{{ asset('bundles/awhscore/js/jsoneditor.min.js') }}" type="application/javascript"></script>
+{% endblock %}
+
+{% block extendJsBottom %}
+    <script>
+        var container = document.getElementById('editor_holder');
+        var options = {
+            mode: 'tree',
+            modes: ['tree', 'view'], // allowed modes
+            onError: function (err) {
+                alert(err.toString());
+            },
+            onModeChange: function (newMode, oldMode) {
+                editor.expandAll();
+            },
+            onChange: function () {
+                if (editor) {
+                    $("#form_settings").val(editor.getText());
+                }
+            }
+        };
+        var editor = new JSONEditor(container, options);
+        editor.set({{ product.settings|raw }});
+        editor.expandAll();
+
+        function updateSettings() {
+            $("#form_settings").val(editor.getText());
+        }
+
+        $('#form_settings').bind('input propertychange', function () {
+            editor.setText($("#form_settings").val());
+            editor.expandAll();
+        });
+        $(function () {
+            $('textarea').each(function () {
+                $(this).height($(this).prop('scrollHeight'));
+            });
+        });
+
+    </script>
+{% endblock %}
+
+    {% block extendCss %}
+        <link href="{{ asset('bundles/awhscore/css/jsoneditor.css') }}" rel="stylesheet" type="text/css">
+
+        <style>
+            tr th {
+                text-align: center;
+            }
+
+            tr td {
+                text-align: center;
+            }
+
+            table {
+                margin-bottom: 0
+            }
+
+            thead {
+                color: black;
+                font-weight: bold;
+                background: none;
+                background-image: none;
+                background-color: none;
+            }
+        </style>
+    {% endblock %}
+{% block fastNavigation %}
+    <ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">Vous êtes ici:</div>
+    <li><a href="{{ path('awhs_core_shop_products') }}">Products</a></li>
+    <li class="active"><a href="{{ path('awhs_core_shop_product', { 'product_id': product.id}) }}">Produit
+            {{ product.name }}</a></li>
+    </ul>{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-body table-responsive no-padding">
+                    {{ form_start(form) }}
+                    {{ form_errors(form) }}
+                    <table class="table table-hover">
+                        <tbody>
+                        <tr>
+                            <td class="col-md-3">
+                                {{ form_label(form.name) }}
+                            </td>
+                            <td class="col-md-9">
+                                {{ form_widget(form.name, { 'attr': {'class': 'form-control'} }) }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-3">
+                                {{ form_label(form.category) }}
+                            </td>
+                            <td class="col-md-9">
+                                {{ form_widget(form.category, { 'attr': {'class': 'form-control'} }) }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-3">
+                                {{ form_label(form.active) }}
+                            </td>
+                            <td class="col-md-9">
+                                {{ form_widget(form.active, { 'attr': {'class': 'form-control'} }) }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-3">
+                                {{ form_label(form.settings) }}
+                            </td>
+                            <td class="col-md-9">
+                                {{ form_widget(form.settings, { 'attr': {'class': 'form-control', 'value': form.settings|json_encode()} }) }}
+                                <div id='editor_holder'></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-3"></td>
+                            <td class="col-md-9">
+                                <button class="btn" type="submit">Enregistrer</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    {{ form_rest(form) }}
+                    {{ form_end(form) }}
+                </div>
+
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+    </div>
+    {# <div class="row">
+         <div class="col-md-6">
+             <div class="box">
+                 <div class="box-header">
+                     <h3 class="box-title">Produits</h3>
+                 </div>
+                 <div class="box-body table-responsive no-padding">
+
+                     <table class="table table-hover">
+                         <thead>
+                         <tr>
+                             <th>Produit</th>
+                             <th>Catégorie</th>
+                             <th></th>
+                         </tr>
+                         </thead>
+                         <tbody>
+                         {% for subscriptionProduct in subscription.SubscriptionProducts %}
+                             <tr>
+                                 <td class="col-md-4">{{ subscriptionProduct.product.name }}</td>
+                                 <td class="col-md-4">{{ subscriptionProduct.product.category.name }}</td>
+                                 <td class="col-md-4">
+                                     {% if subscription.active == 1 %}
+                                         {% if subscriptionProduct.mappingId is not null %}
+                                             <a href="{{ path(subscriptionProduct.product.category.prefix ~ '_aff', {'id': subscriptionProduct.mappingId}) }}"><img
+                                                         src="{{ asset('bundles/awhscore/img/awhs/find.png') }}"
+                                                         title="Afficher"></a>
+                                         {% else %}
+                                             <span class="label label-warning">En attente de création</span>
+                                         {% endif %}
+                                     {% else %}
+                                         {% if subscriptionProduct.mappingId is null and subscriptionProduct.server is not null %}
+                                             <span class="label label-danger">Supprimé</span>
+                                         {% endif %}
+                                     {% endif %}
+                                 </td>
+                             </tr>
+                         {% endfor %}
+                         </tbody>
+                     </table>
+                 </div><!-- /.box-body -->
+             </div><!-- /.box -->
+         </div>
+         <div class="col-md-6">
+             <div class="box">
+                 <div class="box-header">
+                     <h3 class="box-title">Factures</h3>
+                 </div>
+                 <div class="box-body table-responsive no-padding">
+                     <table class="table table-hover">
+                         <thead>
+                         <tr>
+                             <th>Numéro</th>
+                             <th>Date</th>
+                             <th>Statut</th>
+                             <th></th>
+                         </tr>
+                         </thead>
+                         <tbody>
+                         {% for invoice in subscription.invoices %}
+                             <tr>
+                                 <td>{{ invoice.id }}</td>
+                                 <td>{{ invoice.date|date("d/m/Y") }}</td>
+                                 <td>{% if invoice.textStatus == 'paid' %}<span
+                                             class="label label-success">Payée</span>{% elseif invoice.textStatus == 'unpaid' %}
+                                         <span class="label label-danger">Impayée</span>{% endif %}</td>
+                                 <td class="col-md-4"><a
+                                             href="{{ path('awhs_core_invoice', { 'invoice_id': invoice.id }) }}"><img
+                                                 src="{{ asset('bundles/awhscore/img/awhs/find.png') }}"
+                                                 title="Afficher"></a></td>
+                             </tr>
+                         {% endfor %}
+                         </tbody>
+                     </table>
+
+                 </div><!-- /.box-body -->
+             </div><!-- /.box -->
+         </div>
+     </div><!-- /.row -->#}
+{% endblock %}

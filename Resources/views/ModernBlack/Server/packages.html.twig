@@ -1,0 +1,135 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - Packages{% endblock %}
+
+{% block fastNavigation %}
+    <ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">Vous êtes ici:</div>
+    <li><a href="{{ path('awhs_services_homepage') }}">Serveurs</a></li>
+    <li><a href="{{ path('awhs_services_homepage') }}">#1</a></li>
+    <li class="active"><a
+                href="{{ path('awhs_admin_server_dashboard', { server_hostname: server.reverse}) }}">Packages</a></li>
+    </ul>{% endblock %}
+
+{% block pageHeader %}{% endblock %}
+
+
+{% block extendCss %}
+    <style>.sidebarHr {
+            margin: 3px
+        }
+
+        ul {
+            padding-left: 20px;
+            word-wrap: break-word;
+        }
+
+        th {
+            width: 25%;
+            text-align: center
+        }
+
+        td {
+            width: 25%;
+            text-align: center
+        }
+
+        td a {
+            color: #000
+        }</style>{% endblock %}
+{% macro bytesToSize(bytes) %}
+    {% spaceless %}
+        {% set kilobyte = 1024 %}
+        {% set megabyte = kilobyte * 1024 %}
+        {% set gigabyte = megabyte * 1024 %}
+        {% set terabyte = gigabyte * 1024 %}
+        {% if bytes < kilobyte %}
+            {{ bytes ~ ' B' }}
+        {% elseif bytes < megabyte %}
+            {{ (bytes / kilobyte)|number_format(2, '.') ~ ' KB' }}
+        {% elseif bytes < gigabyte %}
+            {{ (bytes / megabyte)|number_format(2, '.') ~ ' MB' }}
+        {% elseif bytes < terabyte %}
+            {{ (bytes / gigabyte)|number_format(2, '.') ~ ' GB' }}
+        {% else %}
+            {{ (bytes / terabyte)|number_format(2, '.') ~ ' TB' }}
+        {% endif %}
+    {% endspaceless %}
+{% endmacro %}
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+
+{% block sidebarMenuMore %}{% include 'AWHSCoreBundle:'~awhs.template~'/Server:left_menu.html.twig' with {'server': server} %}{% endblock %}
+
+{% block overlay %}
+    <div style="text-align:center"><h1>En cours de traitement...</h1></div>{% endblock %}
+{% block extendJsBottom %}
+    <script>
+        $("i").click(function () {
+            $("#overlay").show();
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Packages</h3>
+                </div><!-- /.box-header -->
+                <div class="box-body" style="text-align:center">
+                    <table class="table table-hover no-margin">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Version</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for package in packages %}
+                            <tr>
+                                <td>{{ package.name }}</td>
+                                <td>{{ package.version }}</td>
+                                <td>
+                                    {% if package.is_installed == true %}
+                                        Installed
+                                    {% else %}
+                                        Not Installed
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if package.is_installed == true %}
+                                        {% if package.daemon != '' %}
+                                            {% if package.is_running == true %}
+                                                <a href="{{ path('awhs_admin_server_package_daemon_action', { 'server_hostname': server.reverse, 'package_name': package.name, 'package_action': 'reload' }) }}"><i
+                                                            class="fa fa-refresh"></i></a>&nbsp;&nbsp;
+                                                <a href="{{ path('awhs_admin_server_package_daemon_action', { 'server_hostname': server.reverse, 'package_name': package.name, 'package_action': 'stop' }) }}"><i
+                                                            class="fa fa-stop"></i></a>&nbsp;&nbsp;
+                                            {% else %}
+                                                <a href="{{ path('awhs_admin_server_package_daemon_action', { 'server_hostname': server.reverse, 'package_name': package.name, 'package_action': 'start' }) }}"><i
+                                                            class="fa fa-play"></i></a>&nbsp;&nbsp;
+                                            {% endif %}
+                                        {% endif %}
+                                        <a href="{{ path('awhs_admin_server_package_daemon_action', { 'server_hostname': server.reverse, 'package_name': package.name, 'package_action': 'configure' }) }}"><i
+                                                    class="fa fa-cog"></i></a>&nbsp;&nbsp;
+                                        <a href="{{ path('awhs_admin_server_package_daemon_action', { 'server_hostname': server.reverse, 'package_name': package.name, 'package_action': 'remove' }) }}"><i
+                                                    class="fa fa-trash"></i></a>
+                                    {% else %}
+                                        <a href="{{ path('awhs_admin_server_package_daemon_action', { 'server_hostname': server.reverse, 'package_name': package.name, 'package_action': 'install' }) }}"><i
+                                                    class="fa fa-plus"></i></a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+{% endblock %}

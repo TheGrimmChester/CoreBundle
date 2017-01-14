@@ -1,0 +1,97 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - Mes souscriptions{% endblock %}
+
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+{% block sidebarMenuDashboardActive %} active{% endblock %}
+
+{% block fastNavigation %}{% endblock %}
+{% block pageHeader %}{% endblock %}
+
+{% block extendCss %}
+    <style>
+        tr th {
+            text-align: center;
+        }
+
+        tr td {
+            text-align: center;
+        }
+
+        table {
+            margin-bottom: 0
+        }
+
+        thead {
+            color: black;
+            font-weight: bold;
+            background: none;
+            background-image: none;
+            background-color: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover" style="margin-bottom:0">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Client</th>
+                            <th>Souscription</th>
+                            <th>Début souscription</th>
+                            <th>Fin souscription</th>
+                            <th>Statut</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for subscription in subscriptions %}
+                            <tr>
+                                <td>{{ "%03d"|format(subscription.id) }}</td>
+                                <td class="col-md-3"><a
+                                            href="{{ path('user_admin', {'user_id': subscription.user.id }) }}">{{ subscription.user.lastname ~ " " ~ subscription.user.firstname }}</a>
+                                </td>
+                                <td class="col-md-3">{{ subscription.subscriptionPackage.name }}</td>
+                                <td class="col-md-3">
+                                    {% if subscription.startDate|date("Y") > 0 %}{{ subscription.startDate|date("d/m/Y \\à H:i") }}{% endif %}
+                                </td>
+                                <td class="col-md-3">
+                                    {% if subscription.endDate|date("Y") > 0 %}{{ subscription.endDate|date("d/m/Y \\à H:i") }}{% endif %}
+                                </td>
+                                <td class="col-md-3">
+                                    {% if (subscription.startDate is null) and (subscription.active == 0) %}
+                                        <span class="label label-danger">En attente de paiement</span>
+                                    {% elseif (subscription.startDate is not null and subscription.endDate is null) and (subscription.active == 0) %}
+                                        <span class="label label-warning">En attente de traitement</span>
+                                    {% elseif (subscription.startDate is not null and subscription.endDate is not null) and (subscription.active == 0) %}
+                                        <span class="label label-danger">Inactive</span>
+                                    {% elseif subscription.active == 1 %}
+                                        {% if "now"| date("Y-m-d H:i:s") > subscription.endDate|date("Y-m-d H:i:s") %}
+                                            <span class="label label-danger">Expirée</span>{% endif %}
+                                        {% if "now"| date("Y-m-d H:i:s") < subscription.endDate|date("Y-m-d H:i:s") %}
+                                            <span class="label label-success">Active</span>{% endif %}
+                                    {% endif %}
+                                </td>
+                                <td class="col-md-3">
+                                    <a
+                                            href="{{ path('awhs_core_subscription', { 'subscription_id': subscription.id }) }}">
+                                        <img
+                                                src="{{ asset('bundles/awhscore/img/awhs/find.png') }}"
+                                                title="Afficher"></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+{% endblock %}

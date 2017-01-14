@@ -1,0 +1,72 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - Mes souscriptions{% endblock %}
+
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+{% block sidebarMenuDashboardActive %} active{% endblock %}
+
+{% block fastNavigation %}{% endblock %}
+{% block pageHeader %}{% endblock %}
+
+{% block extendCss %}
+    <style>
+        tr th {
+            text-align: center;
+        }
+
+        tr td {
+            text-align: center;
+        }
+
+        table {
+            margin-bottom: 0
+        }
+
+        thead {
+            color: black;
+            font-weight: bold;
+            background: none;
+            background-image: none;
+            background-color: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover" style="margin-bottom:0">
+                        <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prefix</th>
+                            <th>API</th>
+                            <th>Entity</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for category in categories %}
+                            <tr>
+                                <td class="col-md-3">{{ category.name }}</td>
+                                <td class="col-md-3">{{ category.prefix }}</td>
+                                <td class="col-md-3">{{ category.apiname }}</td>
+                                <td class="col-md-3">{{ category.entity }}</td>
+                                <td class="col-md-3">
+                                    <a href="{{ path('awhs_core_category', { 'category_id': category.id }) }}">
+                                        <img src="{{ asset('bundles/awhscore/img/awhs/find.png') }}"
+                                             title="Afficher"></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+{% endblock %}

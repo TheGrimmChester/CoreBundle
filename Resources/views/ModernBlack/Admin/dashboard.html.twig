@@ -1,0 +1,187 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - Dashboard{% endblock %}
+
+{% block fastNavigation %}{% endblock %}
+
+{% block pageHeader %}{% endblock %}
+
+
+{% block extendCss %}
+    <style>.sidebarHr {
+            margin: 3px
+        }
+
+        ul {
+            padding-left: 20px;
+            word-wrap: break-word;
+        }</style>{% endblock %}
+{% macro bytesToSize(bytes) %}
+    {% spaceless %}
+        {% set kilobyte = 1024 %}
+        {% set megabyte = kilobyte * 1024 %}
+        {% set gigabyte = megabyte * 1024 %}
+        {% set terabyte = gigabyte * 1024 %}
+        {% if bytes < kilobyte %}
+            {{ bytes ~ ' B' }}
+        {% elseif bytes < megabyte %}
+            {{ (bytes / kilobyte)|number_format(2, '.') ~ ' KB' }}
+        {% elseif bytes < gigabyte %}
+            {{ (bytes / megabyte)|number_format(2, '.') ~ ' MB' }}
+        {% elseif bytes < terabyte %}
+            {{ (bytes / gigabyte)|number_format(2, '.') ~ ' GB' }}
+        {% else %}
+            {{ (bytes / terabyte)|number_format(2, '.') ~ ' TB' }}
+        {% endif %}
+    {% endspaceless %}
+{% endmacro %}
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+{% block sidebarMenuMore %}{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box">
+                <div class="box-header"><h3 class="box-title">Core</h3></div><!-- /.box-header -->
+                <div class="box-body" style="text-align:center">
+
+                    <h1>Server</h1>
+                    <div style="width:184px;display: inline;">
+                        <a href="{{ path('awhs_admin_servers') }}">
+                            <span>
+                                <button class="shortcut-button btn btn-default" style="width:100%; max-width:183px;min-height:61px;white-space: normal;margin: 5px;">
+                                    <img src="{{ asset('/images/icons/flat/svg/mind_map.svg') }}" width="24" height="24"><br>
+                                    Servers
+                                </button>
+                            </span>
+                        </a>
+                    </div>
+
+                    <div style="width:184px;display: inline;">
+                        <a href="{{ path('awhs_admin_ips') }}">
+                            <span>
+                                <button class="shortcut-button btn btn-default" style="width:100%; max-width:183px;min-height:61px;white-space: normal;margin: 5px;">
+                                    <img src="{{ asset('/images/icons/flat/svg/globe.svg') }}" width="24" height="24"><br>
+                                    IP Addresses
+                                </button>
+                            </span>
+                        </a>
+                    </div>
+
+                    <div style="width:184px;display: inline;">
+                        <a href="{{ path('awhs_admin_ip_add') }}">
+                            <span>
+                                <button class="shortcut-button btn btn-default" style="width:100%; max-width:183px;min-height:61px;white-space: normal;margin: 5px;">
+                                    <img src="{{ asset('/images/icons/flat/svg/globe.svg') }}" width="24" height="24"><br>
+                                    Add IP Address
+                                </button>
+                            </span>
+                        </a>
+                    </div>
+
+                    <h1>Shop</h1>
+                    <div style="width:184px;display: inline;">
+                        <a href="{{ path('awhs_core_shop_products') }}">
+                            <span>
+                                <button class="shortcut-button btn btn-default" style="width:100%; max-width:183px;min-height:61px;white-space: normal;margin: 5px;">
+                                    <img src="{{ asset('/images/icons/flat/svg/template.svg') }}" width="24" height="24"><br>
+                                    Products
+                                </button>
+                            </span>
+                        </a>
+                    </div>
+
+                    <div style="width:184px;display: inline;">
+                        <a href="{{ path('awhs_core_categories') }}">
+                            <span>
+                                <button class="shortcut-button btn btn-default" style="width:100%; max-width:183px;min-height:61px;white-space: normal;margin: 5px;">
+                                    <img src="{{ asset('/images/icons/flat/svg/template.svg') }}" width="24" height="24"><br>
+                                    Categories
+                                </button>
+                            </span>
+                        </a>
+                    </div>
+
+                    <div style="width:184px;display: inline;">
+                        <a href="{{ path('awhs_core_subscription_packages') }}">
+                            <span>
+                                <button class="shortcut-button btn btn-default" style="width:100%; max-width:183px;min-height:61px;white-space: normal;margin: 5px;">
+                                    <img src="{{ asset('/images/icons/flat/svg/template.svg') }}" width="24" height="24"><br>
+                                    Packages
+                                </button>
+                            </span>
+                        </a>
+                    </div>
+
+                    <h1>General</h1>
+                    <div style="width:184px;display: inline;">
+                        <a href="{{ path('users_admin') }}">
+                            <span>
+                                <button class="shortcut-button btn btn-default" style="width:100%; max-width:183px;min-height:61px;white-space: normal;margin: 5px;">
+                                    <img src="{{ asset('/images/icons/flat/svg/conference_call.svg') }}" width="24" height="24"><br>
+                                    Customers
+                                </button>
+                            </span>
+                        </a>
+                    </div>
+
+                    <div style="width:184px;display: inline;">
+                        <a href="{{ path('awhs_admin_crm_homepage') }}">
+                            <span>
+                                <button class="shortcut-button btn btn-default" style="width:100%; max-width:183px;min-height:61px;white-space: normal;margin: 5px;">
+                                    <img src="{{ asset('/images/icons/flat/svg/customer_support.svg') }}" width="24" height="24"><br>
+                                    Tickets
+                                </button>
+                            </span>
+                        </a>
+                    </div>
+
+                    <div style="width:184px;display: inline;">
+                        <a href="{{ path('awhs_core_admin_subscriptions') }}">
+                            <span>
+                                <button class="shortcut-button btn btn-default" style="width:100%; max-width:183px;min-height:61px;white-space: normal;margin: 5px;">
+                                    <img src="{{ asset('/images/icons/flat/svg/package.svg') }}" width="24" height="24"><br>
+                                    Subscriptions
+                                </button>
+                            </span>
+                        </a>
+                    </div>
+
+                    <div style="width:184px;display: inline;">
+                        <a href="{{ path('awhs_admin_products') }}">
+                            <span>
+                                <button class="shortcut-button btn btn-default" style="width:100%; max-width:183px;min-height:61px;white-space: normal;margin: 5px;">
+                                    <img src="{{ asset('/images/icons/flat/svg/org_unit.svg') }}" width="24" height="24"><br>
+                                    Products
+                                </button>
+                            </span>
+                        </a>
+                    </div>
+
+                    <div style="width:184px;display: inline;">
+                        <a href="{{ path('awhs_core_admin_invoices') }}">
+                            <span>
+                                <button class="shortcut-button btn btn-default" style="width:100%; max-width:183px;min-height:61px;white-space: normal;margin: 5px;">
+                                    <img src="{{ asset('/images/icons/flat/svg/sales_performance.svg') }}" width="24" height="24"><br>
+                                    Invoices
+                                </button>
+                            </span>
+                        </a>
+                    </div>
+
+                    <div style="width:184px;display: inline;">
+                        <a href="{{ path('awhs_admin_tasks_homepage') }}">
+                            <span>
+                                <button class="shortcut-button btn btn-default" style="width:100%; max-width:183px;min-height:61px;white-space: normal;margin: 5px;">
+                                    <img src="{{ asset('/images/icons/flat/svg/list.svg') }}" width="24" height="24"><br>
+                                    Tasks
+                                </button>
+                            </span>
+                        </a>
+                    </div>
+
+                </div><!-- /.box-body --></div><!-- /.box --></div>
+    </div><!-- /.row -->
+{% endblock %}

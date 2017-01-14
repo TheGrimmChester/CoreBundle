@@ -1,0 +1,78 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - Update{% endblock %}
+
+{% block fastNavigation %}
+    <ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">Vous êtes ici:</div>
+    <li><a href="{{ path('awhs_services_homepage') }}">Serveurs</a></li>
+    <li><a href="{{ path('awhs_services_homepage') }}">#1</a></li>
+    <li class="active"><a
+                href="{{ path('awhs_admin_server_dashboard', { server_hostname: server.reverse}) }}">Update</a></li>
+    </ul>{% endblock %}
+
+{% block pageHeader %}{% endblock %}
+
+
+{% block extendCss %}
+    <style>.sidebarHr {
+            margin: 3px
+        }
+
+        ul {
+            padding-left: 20px;
+            word-wrap: break-word;
+        }</style>{% endblock %}
+{% macro bytesToSize(bytes) %}
+    {% spaceless %}
+        {% set kilobyte = 1024 %}
+        {% set megabyte = kilobyte * 1024 %}
+        {% set gigabyte = megabyte * 1024 %}
+        {% set terabyte = gigabyte * 1024 %}
+        {% if bytes < kilobyte %}
+            {{ bytes ~ ' B' }}
+        {% elseif bytes < megabyte %}
+            {{ (bytes / kilobyte)|number_format(2, '.') ~ ' KB' }}
+        {% elseif bytes < gigabyte %}
+            {{ (bytes / megabyte)|number_format(2, '.') ~ ' MB' }}
+        {% elseif bytes < terabyte %}
+            {{ (bytes / gigabyte)|number_format(2, '.') ~ ' GB' }}
+        {% else %}
+            {{ (bytes / terabyte)|number_format(2, '.') ~ ' TB' }}
+        {% endif %}
+    {% endspaceless %}
+{% endmacro %}
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+
+{% block sidebarMenuMore %}{% include 'AWHSCoreBundle:'~awhs.template~'/Server:left_menu.html.twig' with {'server': server} %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Updates</h3>
+                </div><!-- /.box-header -->
+                <div class="box-body" style="text-align:center">
+                    {% set securityUpdateCount = api.getSecurityUpdateCount() %}
+                    {% set UpdateCount = (api.getUpdateCount() - securityUpdateCount) %}
+                    {% if securityUpdateCount > 0 or UpdateCount > 0 %}
+                        <div>
+                            <label style="color:red">You have {{ securityUpdateCount }} security update available. <a
+                                        href="{{ path('awhs_admin_server_packages_update', { 'server_hostname': server.reverse, 'package_type': 'security' }) }}">Update
+                                    Now</a></label><br>
+                            <label style="color:grey">You have {{ UpdateCount }} update available. <a
+                                        href="{{ path('awhs_admin_server_packages_update', { 'server_hostname': server.reverse, 'package_type': 'all' }) }}">Update
+                                    Now</a></label>
+                            <pre style="text-align:left">{{ api.getSecurityUpdate() }}</pre>
+                        </div>
+                    {% endif %}
+
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+{% endblock %}

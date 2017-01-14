@@ -1,0 +1,118 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - {{ 'service.title'|trans }}{% endblock %}
+
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+{% block contentHeader %}
+    <h1>
+        {{ server.name }}
+        <small>Control panel</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="{{ path('awhs_admin_servers') }}"><i class="fa fa-dashboard"></i> Serveurs</a></li>
+        <li><a href="{{ path('awhs_admin_server', { server_hostname: server.reverse}) }}"><i
+                        class="fa fa-dashboard"></i> {{ server.name }}</a></li>
+        <li class="active">Paramètres</li>
+    </ol>
+{% endblock %}
+{% block sidebarMenuMore %}{% include 'AWHSCoreBundle:'~awhs.template~'/Server:left_menu.html.twig' with {'server': server} %}{% endblock %}
+   
+    
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Paramètres</h3>
+                </div><!-- /.box-header -->
+                <div class="box-body">
+                    {#<div class="callout callout-warning">
+                        <h4>Attention!</h4>
+                        <p>Chaque champs vide sera régénéré. Si vous avez déjà uploadé votre clef privée, votre certificat et/ou votre certificat d'autorité (CA), cliquez sur le bouton <b>Fetch</b> pour les récuperer.</p>
+                    </div>#}
+                    <center>
+                        <form id="changeIP"
+                              action="{{ path('awhs_admin_server_settings', {server_hostname: server.reverse}) }}"
+                              method="post">
+                            {{ form_errors(form) }}
+
+                            <table class="table table-hover">
+                                <tbody>
+                                <tr>
+                                    <th class="nom">{{ form_label(form.name) }}</th>
+                                    <td>{{ form_widget(form.name, { 'attr': {'class': 'form-control'} }) }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="country">{{ form_label(form.country) }}</th>
+                                    <td>{{ form_widget(form.country, { 'attr': {'class': 'form-control'} }) }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="nom">{{ form_label(form.reverse) }}</th>
+                                    <td>{{ form_widget(form.reverse, { 'attr': {'class': 'form-control'} }) }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="nom">{{ form_label(form.shortname) }}</th>
+                                    <td>{{ form_widget(form.shortname, { 'attr': {'class': 'form-control'} }) }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="nom">{{ form_label(form.ip) }}</th>
+                                    <td>{{ form_widget(form.ip, { 'attr': {'class': 'form-control'} }) }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="nom">{{ form_label(form.username) }}</th>
+                                    <td>{{ form_widget(form.username, { 'attr': {'class': 'form-control', 'placeholder': 'HIDDEN FOR SECURITY REASON', 'value': ''} }) }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="nom">{{ form_label(form.password) }}</th>
+                                    <td>{{ form_widget(form.password, { 'attr': {'class': 'form-control', 'placeholder': 'HIDDEN FOR SECURITY REASON', 'value': ''} }) }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="nom">{{ form_label(form.private_key) }}</th>
+                                    <td>{{ form_widget(form.private_key, { 'attr': {'class': 'form-control', 'placeholder': 'HIDDEN FOR SECURITY REASON', 'value': ''} }) }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="nom">{{ form_label(form.port) }}</th>
+                                    <td>{{ form_widget(form.port, { 'attr': {'class': 'form-control'} }) }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <h3>Base de données</h3>
+                            <table class="table table-hover">
+                                <tbody>
+                                <tr>
+                                    <th class="nom">{{ form_label(form.database_host) }}</th>
+                                    <td>{{ form_widget(form.database_host, { 'attr': {'class': 'form-control'} }) }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="nom">{{ form_label(form.database_user) }}</th>
+                                    <td>{{ form_widget(form.database_user, { 'attr': {'class': 'form-control', 'placeholder': 'HIDDEN FOR SECURITY REASON', 'value': ''} }) }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="nom">{{ form_label(form.database_password) }}</th>
+                                    <td>{{ form_widget(form.database_password, { 'attr': {'class': 'form-control', 'placeholder': 'HIDDEN FOR SECURITY REASON', 'value': ''} }) }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="nom">{{ form_label(form.database_port) }}</th>
+                                    <td>{{ form_widget(form.database_port, { 'attr': {'class': 'form-control'} }) }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            {{ form_rest(form) }}
+
+                            <input type="submit" name="addServer" value="Envoyer"/>
+                        </form>
+                    </center>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+
+    <!-- JavaScripts -->
+
+{% endblock %}

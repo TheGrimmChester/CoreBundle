@@ -1,0 +1,45 @@
+{% if settings == '' %}
+    <div class="alert alert-warning" role="alert">
+        <strong>Attention!</strong> Aucune configuration n'est fourni.
+    </div>
+{% else %}
+    {% macro bytesToSize(bytes) %}
+        {% spaceless %}
+            {% set kilobyte = 1024 %}
+            {% set megabyte = kilobyte * 1024 %}
+            {% set gigabyte = megabyte * 1024 %}
+            {% set terabyte = gigabyte * 1024 %}
+            {% if bytes < kilobyte %}
+                {{ bytes ~ ' B' }}
+            {% elseif bytes < megabyte %}
+                {{ (bytes / kilobyte)|number_format(2, '.') ~ ' KB' }}
+            {% elseif bytes < gigabyte %}
+                {{ (bytes / megabyte)|number_format(2, '.') ~ ' MB' }}
+            {% elseif bytes < terabyte %}
+                {{ (bytes / gigabyte)|number_format(2, '.') ~ ' GB' }}
+            {% else %}
+                {{ (bytes / terabyte)|number_format(2, '.') ~ ' TB' }}
+            {% endif %}
+        {% endspaceless %}
+    {% endmacro %}
+    {#{{ dump(settings) }}#}
+    <ul>
+        {% if settings.disk_space.hard is defined %}
+            <li>Espace disque
+            : {{ _self.bytesToSize(settings.disk_space.hard*1*1024) }}{#{{ settings.disk_space.hard|replace({'-1': '&infin;'})|raw }}#}</li>{% endif %}
+        {% if settings.domain.max.value is defined %}
+            <li>Nom de domaine : {{ settings.domain.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+        {% if settings.subdomain.max.value is defined %}
+            <li>Sous-domaine : {{ settings.subdomain.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+        {% if settings.ftp.max.value is defined %}
+            <li>Compte FTP : {{ settings.ftp.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+        {% if settings.database.max.value is defined %}
+            <li>Base de données : {{ settings.database.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+        {% if settings.database_user.max.value is defined %}
+            <li>Utilisateur(s) SQL
+            : {{ settings.database_user.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+        <li>Connexion SQL à distance: Oui</li>
+        {% if settings.email.max.value is defined %}
+            <li>E-mail : {{ settings.email.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+    </ul>
+{% endif %}

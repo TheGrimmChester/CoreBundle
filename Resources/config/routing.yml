@@ -1,0 +1,212 @@
+awhs_admin_homepage:
+    path:  /admin
+    defaults: { _controller: AWHSCoreBundle:Admin:dashboard }
+awhs_admin_products:
+    path:  /admin/products
+    defaults: { _controller: AWHSCoreBundle:Admin:products }
+awhs_admin_ip_add:
+    path:  /admin/ip/add
+    defaults: { _controller: AWHSCoreBundle:Default:ipAdd }
+awhs_admin_ips:
+    path:  /admin/ipsawhs_admin_servers:
+    path:  /admin/servers
+    defaults: { _controller: AWHSCoreBundle:Server:servers }
+    defaults: { _controller: AWHSCoreBundle:Default:ips }
+
+#/admin
+awhs_admin_ips:
+    path:  /admin/ips
+    defaults: { _controller: AWHSCoreBundle:Default:ips }
+awhs_admin_ip_add:
+    path:  /admin/ip/add
+    defaults: { _controller: AWHSCoreBundle:Default:ipAdd }
+awhs_admin_manage_ip:
+    path:  /admin/ip/{id}
+    defaults: { _controller: AWHSCoreBundle:Default:ip }
+
+#/admin/server
+awhs_admin_servers:
+    path:  /admin/servers
+    defaults: { _controller: AWHSCoreBundle:Server:servers }
+awhs_admin_server_dashboard:
+    path:  /admin/server/{server_hostname}/dashboard
+    defaults: { _controller: AWHSCoreBundle:Server:dashboard }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+awhs_admin_server_settings:
+    path:  /admin/server/{server_hostname}/settings
+    defaults: { _controller: AWHSCoreBundle:Server:serverSettings }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+awhs_admin_server_json:
+    path:  /admin/server/{server_hostname}.json
+    defaults: { _controller: AWHSCoreBundle:Server:serverJson }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+awhs_admin_server_processes_json:
+    path:  /admin/server/{server_hostname}/processes.json
+    defaults: { _controller: AWHSCoreBundle:Server:processesJson }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+
+awhs_admin_server:
+    path:  /admin/server/{server_hostname}
+    defaults: { _controller: AWHSCoreBundle:Server:server }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+awhs_admin_server_update:
+    path:  /admin/server/{server_hostname}/update
+    defaults: { _controller: AWHSCoreBundle:Server:update }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+awhs_admin_server_security_update_count:
+    path:  /admin/server/{server_hostname}/security-update/count
+    defaults: { _controller: AWHSCoreBundle:Server:securityUpdateCount }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+awhs_admin_server_packages_update:
+    path:  /admin/server/{server_hostname}/packages/update/{package_type}
+    defaults: { _controller: AWHSCoreBundle:Server:packagesUpdate }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+awhs_admin_server_ssh:
+    path:  /admin/server/{server_hostname}/ssh
+    defaults: { _controller: AWHSCoreBundle:Server:serverSsh }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+awhs_admin_server_firewall:
+    path:  /admin/server/{server_hostname}/firewall
+    defaults: { _controller: AWHSCoreBundle:Server:firewall }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+awhs_admin_server_packages:
+    path:  /admin/server/{server_hostname}/packages
+    defaults: { _controller: AWHSCoreBundle:Server:packages }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+awhs_admin_server_packages_json:
+    path:  /admin/server/{server_hostname}/packages.json
+    defaults: { _controller: AWHSCoreBundle:Server:packagesJson }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+
+awhs_admin_server_package_daemon_action:
+    path:  /admin/server/{server_hostname}/package/{package_name}/{package_action}
+    defaults: { _controller: AWHSCoreBundle:Server:package }
+    requirements:
+        package_action: start|stop|reload|restart|install|configure|remove
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+awhs_admin_server_category_add:
+    path:  /admin/server/{server_hostname}/product-category/add
+    defaults: { _controller: AWHSCoreBundle:Server:addProductCategory }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+awhs_admin_server_categories:
+    path:  /admin/server/{server_hostname}/product-categories
+    defaults: { _controller: AWHSCoreBundle:Server:productCategories }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+awhs_admin_server_category_edit:
+    path:  /admin/server/{server_hostname}/product-category/{server_product_category_id}/edit
+    defaults: { _controller: AWHSCoreBundle:Server:editProductCategory }
+    requirements:
+        server_hostname: ([?a-zA-Z0-9-.\+]{2,256}\.[a-z]{2,4}\b)|(([a-zA-Z0-9]{1,4}|):){1,7}([a-zA-Z0-9]{1,4}|:)|\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b
+
+#Subscription
+awhs_core_subscriptions:
+    path:  /subscriptions
+    defaults: { _controller: AWHSCoreBundle:Subscription:subscriptions }
+awhs_core_subscription:
+    path:  /subscription/{subscription_id}
+    defaults: { _controller: AWHSCoreBundle:Subscription:subscription }
+awhs_core_subscription_renew_step_0:
+    path:  /subscription/{subscription_id}/renew/step/0
+    defaults: { _controller: AWHSCoreBundle:Subscription:renew_step_0 }
+awhs_core_subscription_renew_step_1:
+    path:  /subscription/{subscription_id}/renew/step/1
+    defaults: { _controller: AWHSCoreBundle:Subscription:renew_step_1 }
+awhs_core_subscription_renew_step_2:
+    path:  /subscription/{subscription_id}/renew/step/2
+    defaults: { _controller: AWHSCoreBundle:Subscription:renew_step_2 }
+awhs_core_subscription_renew:
+    path:  /subscription/{subscription_id}/renew
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: awhs_core_subscription_renew_step_0
+        permanent: true
+awhs_core_admin_subscriptions:
+    path:  /admin/subscriptions
+    defaults: { _controller: AWHSCoreBundle:Subscription:adminSubscriptions }
+awhs_core_admin_subscription_product:
+    path:  /admin/subscription-product/{subscription_product_id}
+    defaults: { _controller: AWHSCoreBundle:SubscriptionProduct:adminSubscriptionProduct }
+
+#Invoice
+awhs_core_invoices:
+    path:  /invoices
+    defaults: { _controller: AWHSCoreBundle:Invoice:invoices }
+awhs_core_invoice:
+    path:  /invoice/{invoice_id}
+    defaults: { _controller: AWHSCoreBundle:Invoice:invoice }
+awhs_core_invoice_pay:
+    path:  /invoice/{invoice_id}/pay
+    defaults: { _controller: AWHSCoreBundle:Invoice:pay }
+awhs_core_invoice_print:
+    path:  /invoice/{invoice_id}/print
+    defaults: { _controller: AWHSCoreBundle:Invoice:printInvoice }
+awhs_core_admin_invoices:
+    path:  /admin/invoices
+    defaults: { _controller: AWHSCoreBundle:Invoice:adminInvoices }
+awhs_core_admin_invoice:
+    path:  /admin/invoice/{invoice_id}
+    defaults: { _controller: AWHSCoreBundle:Invoice:adminInvoice }
+awhs_core_admin_invoice_pay:
+    path:  /admin/invoice/{invoice_id}/pay
+    defaults: { _controller: AWHSCoreBundle:Invoice:adminPay }
+awhs_core_admin_invoice_print:
+    path:  /admin/invoice/{invoice_id}/print
+    defaults: { _controller: AWHSCoreBundle:Invoice:adminPrintInvoice }
+
+#Shop
+awhs_core_shop:
+    path:  /shop
+    defaults: { _controller: AWHSCoreBundle:Shop:catalog }
+
+#Cart
+awhs_core_cart:
+    path:  /cart
+    defaults: { _controller: AWHSCoreBundle:Cart:cart }
+awhs_core_cart_config:
+    path:  /cart/config
+    defaults: { _controller: AWHSCoreBundle:Cart:configuration }
+awhs_core_cart_review:
+    path:  /cart/review
+    defaults: { _controller: AWHSCoreBundle:Cart:review }
+
+#Catégories de produits
+awhs_core_categories:
+    path: /admin/categories
+    defaults: { _controller: AWHSCoreBundle:Category:categories }
+awhs_core_category:
+    path: /admin/category/{category_id}
+    defaults: { _controller: AWHSCoreBundle:Category:category }
+#Produits
+awhs_core_shop_products:
+    path: /admin/shop-products
+    defaults: { _controller: AWHSCoreBundle:Product:products }
+awhs_core_shop_product:
+    path: /admin/shop-product/{product_id}
+    defaults: { _controller: AWHSCoreBundle:Product:product }
+#SubscriptionPackage
+awhs_core_subscription_packages:
+    path: /admin/subscription-packages
+    defaults: { _controller: AWHSCoreBundle:SubscriptionPackage:subscriptionPackages }
+awhs_core_subscription_package:
+    path: /admin/subscription-package/{subscription_packages_id}
+    defaults: { _controller: AWHSCoreBundle:SubscriptionPackage:subscriptionPackage }
+awhs_core_subscription_package_product_modify:
+    path: /admin/subscription-package/{subscription_packages_id}/product/{product_id}/modify
+    defaults: { _controller: AWHSCoreBundle:SubscriptionPackage:subscriptionPackage }
+awhs_core_subscription_package_product_delete:
+    path: /admin/subscription-package/{subscription_packages_id}/product/{product_id}/delete
+    defaults: { _controller: AWHSCoreBundle:SubscriptionPackage:subscriptionPackage }

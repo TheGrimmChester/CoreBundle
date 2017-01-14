@@ -1,0 +1,170 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - Panier{% endblock %}
+
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+{% block sidebarMenuDashboardActive %} active{% endblock %}
+
+{% block fastNavigation %}{% endblock %}
+{% block pageHeader %}{% endblock %}
+{% block extendCss %}
+    <style>
+        #progressbar {
+            overflow: hidden;
+            /*CSS counters to number the steps*/
+            counter-reset: step;
+        }
+
+        #progressbar li {
+            list-style-type: none;
+            color: black;
+            text-transform: uppercase;
+            font-size: 9px;
+            width: 25%;
+            float: left;
+            position: relative;
+            font-size: 14px;
+        }
+
+        #progressbar li:before {
+            content: counter(step);
+            counter-increment: step;
+            width: 20px;
+            line-height: 20px;
+            display: block;
+            font-size: 10px;
+            color: #333;
+            background: white;
+            border-radius: 3px;
+            /*margin: 0 auto 5px auto;*/
+            float: left;
+        }
+
+        /*progressbar connectors*/
+        #progressbar li:after {
+            content: '';
+            width: 100%;
+            height: 2px;
+            background: white;
+            position: absolute;
+            left: -50%;
+            top: 9px;
+            z-index: -1; /*put it behind the numbers*/
+        }
+
+        #progressbar li:first-child:after {
+            /*connector not needed before the first step*/
+            content: none;
+        }
+
+        /*marking active/completed steps green*/
+        /*The number of the step and the connector before it = green*/
+        #progressbar li.active:before, #progressbar li.active:after {
+            background: #27AE60;
+            color: white;
+            text-align: center;
+        }
+
+        #progressbar li:before, #progressbar li:after {
+            background: #B2B2B2;
+            color: white;
+            text-align: center;
+        }</style>
+{% endblock %}
+
+{% block content %}
+    {% set subtotal = subscription.subscriptionPackage.price %}
+    {% set taxe = 0.00 %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="invoice panel panel-default p-40">
+                <div class="panel-body p-t-0">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <ul id="progressbar">
+                                <li>Configuration</li>
+                                <li class="active">Passer en revue</li>
+                                <li>Paiement</li>
+                            </ul>
+                            <form action="{{ path('awhs_core_subscription_renew_step_2', { subscription_id: subscription.id }) }}"
+                                  method="post">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-left">DESCRIPTION</th>
+                                        <th style="width:145px" class="text-right">UNITE</th>
+                                        <th style="width:95px" class="text-right">TOTAL</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr class="item-row">
+                                        <td>
+                                            <div class="text-primary">
+                                                <strong><span>{{ subscription.subscriptionPackage.name }}</span></strong>
+                                            </div>
+                                            <ul>
+                                                {% for subscriptionProduct in subscription.subscriptionPackage.productsPackage %}
+                                                    <li>
+                                                        <small class="width-100p">{{ subscriptionProduct.product.name }}
+                                                            ({{ subscriptionProduct.product.category.name }})
+                                                        </small>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td>
+                                        <td class="text-right cost">
+                                            <span>${{ subscription.subscriptionPackage.price|number_format(2, '.', ',') }}</span>
+                                        </td>
+                                        <td class="text-right price">
+                                            ${{ (subscription.subscriptionPackage.price*months)|number_format(2, '.', ',') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1" rowspan="5"></td>
+                                        <td class="text-right"><strong>Durée: </strong></td>
+                                        <td class="text-right">{{ months }} mois</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right"><strong>Rabais</strong></td>
+                                        <td class="text-right" id="rebate">$0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right"><strong>Sous-total</strong></td>
+                                        <td class="text-right" id="subtotal">
+                                            ${{ subtotal|number_format(2, '.', ',') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right no-border"><strong>Taxes</strong></td>
+                                        <td class="text-right">${{ (subtotal*taxe)|number_format(2, '.', ',') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right no-border">
+                                            <div><strong>Total</strong></div>
+                                        </td>
+                                        <td class="text-right" id="total">
+                                            ${{ (subtotal+(subtotal*taxe))|number_format(2, '.', ',') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan=1>
+                                            <button onclick="window.location='{{ path('awhs_core_subscription_renew_step_0', { subscription_id: subscription.id }) }}';return false;"
+                                                    class="btn btn-primary btn-sm">Changer la configuration
+                                            </button>
+                                        </td>
+                                        <td colspan=2 class="text-right">
+                                            <button type="submit" class="btn btn-primary btn-sm">Renouveler et payer
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- /.row -->
+{% endblock %}

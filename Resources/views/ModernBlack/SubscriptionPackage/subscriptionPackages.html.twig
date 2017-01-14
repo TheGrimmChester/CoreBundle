@@ -1,0 +1,84 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - Mes packages{% endblock %}
+
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+{% block sidebarMenuDashboardActive %} active{% endblock %}
+
+{% block fastNavigation %}{% endblock %}
+{% block pageHeader %}{% endblock %}
+
+{% block extendCss %}
+    <style>
+        tr th {
+            text-align: center;
+        }
+
+        tr td {
+            text-align: center;
+        }
+
+        table {
+            margin-bottom: 0
+        }
+
+        thead {
+            color: black;
+            font-weight: bold;
+            background: none;
+            background-image: none;
+            background-color: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover" style="margin-bottom:0">
+                        <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prix</th>
+                            <th>Position</th>
+                            <th>Statut</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for subscriptionPackage in subscriptionPackages %}
+                            <tr>
+                                <td class="col-md-3">{{ subscriptionPackage.name }}</td>
+                                <td class="col-md-3">
+                                    {% if subscriptionPackage.price == 0 %}
+                                        <span class="label" style="background-color: #519051">Gratuit</span>
+                                    {% else %}
+                                        {{ subscriptionPackage.price }}
+                                    {% endif %}
+                                </td>
+                                <td class="col-md-3">{{ subscriptionPackage.position }}</td>
+                                <td class="col-md-3">
+                                    {% if subscriptionPackage.active == 0 %}
+                                        <span class="label label-danger">Inactif</span>
+                                    {% else %}
+                                        <span class="label label-success">Actif</span>
+                                    {% endif %}
+                                </td>
+                                <td class="col-md-3">
+                                    <a href="{{ path('awhs_core_subscription_package', { 'subscription_packages_id': subscriptionPackage.id }) }}">
+                                        <img src="{{ asset('bundles/awhscore/img/awhs/find.png') }}"
+                                             title="Afficher"></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+{% endblock %}

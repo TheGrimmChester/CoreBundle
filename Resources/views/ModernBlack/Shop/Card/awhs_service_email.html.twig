@@ -1,0 +1,6 @@
+<ul>
+    {% if settings.email.max.value is defined %}
+        <li>E-mail : {{ settings.email.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+    {% if settings.emailforward.max.value is defined %}
+        <li>Redirection e-mail : {{ settings.emailforward.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+</ul>

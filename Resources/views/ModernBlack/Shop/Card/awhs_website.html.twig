@@ -1,0 +1,19 @@
+{% if settings == '' %}
+    <div class="alert alert-warning" role="alert">
+        <strong>Attention!</strong> Aucune configuration n'est fourni.
+    </div>
+{% else %}
+    {#{{ dump(settings) }}#}
+    <ul>
+        {% if settings.domain.max.value is defined %}
+            <li>Nom de domaine : {{ settings.domain.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+        {% if settings.subdomain.max.value is defined %}
+            <li>Sous-domaine : {{ settings.subdomain.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+        {% if settings.ftp.max.value is defined %}
+            <li>Compte FTP : {{ settings.ftp.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+        {% if settings.database.max.value is defined %}
+            <li>Base de données : {{ settings.database.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+        {% if settings.email.max.value is defined %}
+            <li>E-mail : {{ settings.email.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+    </ul>
+{% endif %}

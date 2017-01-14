@@ -1,0 +1,30 @@
+{% set form_fields_settings = attribute(item.settings, index_package) %}
+<h4>Configuration de {{ product.name }}</h4>
+<div>
+    {% for field in settings.form_fields %}
+        {% if field.name == "os" %}
+            <div class="form-group">
+                <label>{{ field.label }}:</label>
+                <select class="form-control" id="{{ field.name }}"
+                        name="{{ item.secure_id }}[{{ index_package }}][{{ index }}][{{ field.name }}]"
+                        {% if field.required == true %}required="required"{% endif %} >
+                    <option value="debian-8.0-standard_8.0-1_amd64.tar.gz">debian-8.0-standard_8.0-1_amd64.tar.gz
+                    </option>
+                </select>
+            </div>
+        {% else %}
+            <div class="form-group">
+                <label>{{ field.label }}:</label>
+                <input type="text" id="{{ field.name }}"
+                       name="{{ item.secure_id }}[{{ index_package }}][{{ index }}][{{ field.name }}]"
+                       {% if field.required == true %}required="required"{% endif %} {% if field.pattern is defined %}pattern="{{ field.pattern }}"{% endif %}
+                       class="form-control" {% if field.placeholder is defined %}placeholder="{{ field.placeholder }}"{% endif %}
+                       value="{% if attribute(attribute(form_fields_settings, index), field.name) is defined %}{{ attribute(attribute(form_fields_settings, index), field.name) }}{% endif %}">
+            </div>
+        {% endif %}
+    {% endfor %}
+    {#<div class="form-group">
+        <label>Hostname:</label>
+        <input type="text" id="hostname" name="{{ item.secure_id }}[{{ index_package }}][{{ index }}][hostname]" required="required" pattern="^(?:[a-zA-Z0-9]+(?:\-*[a-zA-Z0-9])*\.)+[a-zA-Z]{2,6}$" class="form-control" placeholder="example.com" value="{% if attribute(form_fields_settings, index).hostname is defined %}{{ attribute(form_fields_settings, index).hostname }}{% endif %}">
+    </div>#}
+</div>

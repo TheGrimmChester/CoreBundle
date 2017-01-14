@@ -1,0 +1,331 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - {{ hosting.PrimaryDomain }}{% endblock %}
+
+{% block fastNavigation %}
+    <ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">Vous êtes ici:</div>
+    <li><a href="{{ path('awhs_services_homepage') }}">Service</a></li>
+    <li class="active"><a
+                href="{{ path('awhs_service_whosting_aff', { id: hosting.service.id}) }}">#{{ hosting.service.id }}</a>
+    </li>
+    </ul>{% endblock %}
+
+{% block pageHeader %}{% endblock %}
+
+
+{% block extendCss %}
+    <style>.sidebarHr {
+            margin: 3px
+        }
+
+        ul {
+            padding-left: 20px;
+            word-wrap: break-word;
+        }</style>{% endblock %}
+{% macro bytesToSize(bytes) %}
+    {% spaceless %}
+        {% set kilobyte = 1024 %}
+        {% set megabyte = kilobyte * 1024 %}
+        {% set gigabyte = megabyte * 1024 %}
+        {% set terabyte = gigabyte * 1024 %}
+        {% if bytes < kilobyte %}
+            {{ bytes ~ ' B' }}
+        {% elseif bytes < megabyte %}
+            {{ (bytes / kilobyte)|number_format(2, '.') ~ ' KB' }}
+        {% elseif bytes < gigabyte %}
+            {{ (bytes / megabyte)|number_format(2, '.') ~ ' MB' }}
+        {% elseif bytes < terabyte %}
+            {{ (bytes / gigabyte)|number_format(2, '.') ~ ' GB' }}
+        {% else %}
+            {{ (bytes / terabyte)|number_format(2, '.') ~ ' TB' }}
+        {% endif %}
+    {% endspaceless %}
+{% endmacro %}
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+{% block contentHeader %}
+    <h1>
+        {{ hosting.PrimaryDomain }}
+        <small>Control panel</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="{{ path('awhs_services_homepage') }}"><i class="fa fa-dashboard"></i> Services</a></li>
+        <li class="active"><i class="fa "></i>Service #{{ hosting.service.id }}</li>
+    </ol>
+{% endblock %}
+{% block sidebarMenuMore %}
+    <li class="mm-dropdown">
+        <a href="#"><i class="menu-icon fa fa-laptop"></i><span class="mm-text">Hébergement</span></a>
+        <ul>
+            <li>
+                <a tabindex="-1" href="{{ path('awhs_service_whosting_aff', { id: hosting.service.id}) }}"><span
+                            class="mm-text">Accueil</span></a>
+            </li>
+            <li class="mm-dropdown">
+                <a href="#"><span class="mm-text">Base de données</span></a>
+                <ul>
+                    <li><a tabindex="-1"
+                           href="{{ path('awhs_service_whosting_managedatabases', { id: hosting.service.id}) }}"><i
+                                    class="fa fa-angle-double-right"></i> Bases de donnnées</a></li>
+                    <li><a tabindex="-1"
+                           href="{{ path('awhs_service_whosting_manageusers', { id: hosting.service.id}) }}"><i
+                                    class="fa fa-angle-double-right"></i> Utilisateurs</a></li>
+                    <li><a tabindex="-1" href="/phpmyadmin" target="_blank"><i class="fa fa-angle-double-right"></i>
+                            phpMyAdmin</a></li>
+                </ul>
+            </li>
+            <li>
+                <a tabindex="-1" href="{{ path('awhs_service_whosting_manageftps', { id: hosting.service.id}) }}"><span
+                            class="mm-text">FTP</span></a>
+            </li>
+            <li class="mm-dropdown">
+                <a href="#"><span class="mm-text">E-mail</span></a>
+                <ul>
+                    <li><a tabindex="-1"
+                           href="{{ path('awhs_service_whosting_manageemails', { id: hosting.service.id}) }}"><i
+                                    class="fa fa-angle-double-right"></i> Adresses e-mail</a></li>
+                    <li><a tabindex="-1"
+                           href="{{ path('awhs_service_whosting_manageemailsforwards', { id: hosting.service.id}) }}"><i
+                                    class="fa fa-angle-double-right"></i> Alias et redirections</a></li>
+                    <li><a tabindex="-1" href="/horde" target="_blank"><i class="fa fa-angle-double-right"></i> Webmail</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="mm-dropdown">
+                <a href="#"><span class="mm-text">Nom de domaine</span></a>
+                <ul>
+                    <li><a tabindex="-1"
+                           href="{{ path('awhs_service_whosting_managedomains', { id: hosting.service.id}) }}"><i
+                                    class="fa fa-angle-double-right"></i> Noms de domaines</a></li>
+                    <li><a tabindex="-1"
+                           href="{{ path('awhs_service_whosting_managesubdomains', { id: hosting.service.id}) }}"><i
+                                    class="fa fa-angle-double-right"></i> Gérer les sous-domaines</a></li>
+                </ul>
+            </li>
+            <li>
+                <a tabindex="-1" href="{{ path('awhs_service_whosting_managessl', { id: hosting.service.id}) }}"><span
+                            class="mm-text">SSL</span></a>
+            </li>
+        </ul>
+    </li>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Serveur</h3>
+                </div><!-- /.box-header -->
+                <div class="box-body" style="text-align:left">
+                    <div style="width:184px;margin-bottom: 5px;display: inline;margin: 5px;">
+                        <a href="">
+                            <button class="shortcut-button btn btn-default"
+                                    style="width:100%; max-width:183px;white-space: normal;" name="doStop" id="doStop"
+                                    value="Arreter">
+                                <img src="{{ asset('/images/CommunityHelp.png') }}" width="24" height="24"
+                                     alt="Arr&ecirc;ter"><br>
+                                Paramètres généraux
+                            </button>
+                        </a>
+                    </div>
+                    <div style="width:184px;margin-bottom: 5px;display: inline;margin: 5px;">
+                        <a href="">
+                            <button class="shortcut-button btn btn-default"
+                                    style="width:100%; max-width:183px;white-space: normal;" name="doStop" id="doStop"
+                                    value="Arreter">
+                                <img src="{{ asset('/images/CommunityHelp.png') }}" width="24" height="24"
+                                     alt="Arr&ecirc;ter"><br>
+                                Ajouter un utilisateur
+                            </button>
+                        </a>
+                    </div>
+                    <div style="width:184px;margin-bottom: 5px;display: inline;margin: 5px;">
+                        <a href="">
+                            <button class="shortcut-button btn btn-default"
+                                    style="width:100%; max-width:183px;white-space: normal;" name="doStop" id="doStop"
+                                    value="Arreter">
+                                <img src="{{ asset('/images/CommunityHelp.png') }}" width="24" height="24"
+                                     alt="Arr&ecirc;ter"><br>
+                                Firewall
+                            </button>
+                        </a>
+                    </div>
+                    <div style="width:184px;margin-bottom: 5px;display: inline;margin: 5px;">
+                        <a href="">
+                            <button class="shortcut-button btn btn-default"
+                                    style="width:100%; max-width:183px;white-space: normal;" name="doStop" id="doStop"
+                                    value="Arreter">
+                                <img src="{{ asset('/images/CommunityHelp.png') }}" width="24" height="24"
+                                     alt="Arr&ecirc;ter"><br>
+                                Services
+                            </button>
+                        </a>
+                    </div>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+        <div class="col-sm-3">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Clients</h3>
+                </div><!-- /.box-header -->
+                <div class="box-body" style="text-align:center">
+                    <div style="margin-bottom: 5px">
+                        <a href="">
+                            <button class="shortcut-button btn btn-default"
+                                    style="width:100%; max-width:183px;white-space: normal;" name="doStop" id="doStop"
+                                    value="Arreter">
+                                <img src="{{ asset('/images/CommunityHelp.png') }}" width="24" height="24"
+                                     alt="Arr&ecirc;ter"><br>
+                                G&eacute;rer les utilisateurs
+                            </button>
+                        </a>
+                    </div>
+                    <div style="margin-bottom: 5px">
+                        <a href="">
+                            <button class="shortcut-button btn btn-default"
+                                    style="width:100%; max-width:183px;white-space: normal;" name="doStop" id="doStop"
+                                    value="Arreter">
+                                <img src="{{ asset('/images/CommunityHelp.png') }}" width="24" height="24"
+                                     alt="Arr&ecirc;ter"><br>
+                                Ajouter un utilisateur
+                            </button>
+                        </a>
+                    </div>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+        <div class="col-sm-3">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Templates</h3>
+                </div><!-- /.box-header -->
+                <div class="box-body" style="text-align:center">
+                    <div style="margin-bottom: 5px">
+                        <a href="{{ path('awhs_service_whosting_manageftps', { id: hosting.service.id}) }}">
+							<span>
+							<button class="shortcut-button btn btn-default"
+                                    style="width:100%; max-width:183px;white-space: normal;">
+                                <img src="{{ asset('/images/gnome-ftp.png') }}" width="24" height="24"
+                                     alt="Hostname"><br>
+                                G&eacute;rer les acc&egrave;s
+                            </button>
+                            </span>
+                        </a>
+                    </div>
+                    <div style="margin-bottom: 5px">
+                        <a href="">
+                            <button class="shortcut-button btn btn-default"
+                                    style="width:100%; max-width:183px;white-space: normal;" name="doStop" id="doStop"
+                                    value="Arreter">
+                                <img src="{{ asset('/images/CommunityHelp.png') }}" width="24" height="24"
+                                     alt="Arr&ecirc;ter"><br>
+                                Template VirtualHost
+                            </button>
+                        </a>
+                    </div>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+        <div class="col-sm-3">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">FTP</h3>
+                </div><!-- /.box-header -->
+                <div class="box-body" style="text-align:center">
+                    <div style="margin-bottom: 5px">
+                        <a href="{{ path('awhs_service_whosting_manageftps', { id: hosting.service.id}) }}">
+							<span>
+							<button class="shortcut-button btn btn-default"
+                                    style="width:100%; max-width:183px;white-space: normal;">
+                                <img src="{{ asset('/images/gnome-ftp.png') }}" width="24" height="24"
+                                     alt="Hostname"><br>
+                                G&eacute;rer les acc&egrave;s
+                            </button>
+                            </span>
+                        </a>
+                    </div>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+        <div class="col-sm-3">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">E-mail</h3>
+                </div><!-- /.box-header -->
+                <div class="box-body" style="text-align:center">
+                    <div style="margin-bottom: 5px">
+                        <a href="{{ path('awhs_service_whosting_manageemails', { id: hosting.service.id}) }}">
+                            <span>
+                                <button class="shortcut-button btn btn-default"
+                                        style="width:100%; max-width:183px;white-space: normal;">
+                                    <img src="{{ asset('/images/Mails.png') }}" width="24" height="24"
+                                         alt="Hostname"><br>
+                                    G&eacute;rer les e-mails
+                                </button>
+                            </span>
+                        </a>
+                    </div>
+                    <div style="margin-bottom: 5px">
+                        <a href="{{ path('awhs_service_whosting_manageemailsforwards', { id: hosting.service.id}) }}"><span>
+							<span>
+							   <button class="shortcut-button btn btn-default"
+                                       style="width:100%; max-width:183px;white-space: normal;">
+                                   <img src="{{ asset('/images/email_forward.png') }}" width="24" height="24"
+                                        alt="Hostname"><br>
+                                   Alias et redirections
+                               </button>
+                            </span>
+                        </a>
+                    </div>
+                    <div style="margin-bottom: 5px">
+                        <a href="/horde" target="_blank">
+                            <button class="shortcut-button btn btn-default"
+                                    style="width:100%; max-width:183px;white-space: normal;" name="doStop" id="doStop"
+                                    value="Arreter">
+                                <img src="{{ asset('/images/Mail.png') }}" width="24" height="24"
+                                     alt="Arr&ecirc;ter"><br>
+                                Webmail
+                            </button>
+                        </a>
+                    </div>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+        <div class="col-sm-3">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Nom de domaine</h3>
+                </div><!-- /.box-header -->
+                <div class="box-body" style="text-align:center">
+                    <div style="margin-bottom: 5px">
+                        <a href="{{ path('awhs_service_whosting_managedomains', { id: hosting.service.id}) }}"><span>
+                              
+							<button class="shortcut-button btn btn-default"
+                                    style="width:100%; max-width:183px;white-space: normal;">
+                                <img src="{{ asset('/images/network_local.png') }}" width="24" height="24"
+                                     alt="Hostname"><br>G&eacute;rer les noms de domaines
+                            </button>
+
+                        </a>
+                    </div>
+                    <div style="margin-bottom: 5px">
+                        <a href="{{ path('awhs_service_whosting_managesubdomains', { id: hosting.service.id}) }}"><span>
+                            <span>    
+							<button class="shortcut-button btn btn-default"
+                                    style="width:100%; max-width:183px;white-space: normal;">
+                                <img src="{{ asset('/images/domain-names-px-png.png') }}" width="24" height="24"
+                                     alt="Hostname"><br>
+                                G&eacute;rer les sous-domaines
+                            </button>
+                            </span>
+                        </a>
+                    </div>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+{% endblock %}

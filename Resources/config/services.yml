@@ -1,0 +1,24 @@
+parameters:
+    twig.asset_exists_extension.class: AWHS\CoreBundle\Twig\Extension\AssetExistsExtension
+    twig.bundle_exists_extension.class: AWHS\CoreBundle\Twig\Extension\BundleExistsExtension
+    encryption_key: "1dHRWJMZQb13q2wVOOEj529HutS8WemhkkzDxKgzEAJv2dKgcAMKVTrKfsMIZTw"
+
+services:
+    awhs_core.server:
+        class: AWHS\CoreBundle\API\Server
+        arguments: [ "@doctrine.orm.entity_manager" ] 
+    awhs_core.iptables:
+        class: AWHS\CoreBundle\API\Iptables
+        arguments: [ "@doctrine.orm.entity_manager" ]
+    awhs_core.tree_walker:
+        class: AWHS\CoreBundle\API\TreeWalker
+    twig.asset_exists_extension:
+        class: '%twig.asset_exists_extension.class%'
+        arguments: ['@kernel']
+        tags:
+          - { name: twig.extension }
+    twig.bundle_exists_extension:
+        class: '%twig.bundle_exists_extension.class%'
+        arguments: ['@kernel']
+        tags:
+          - { name: twig.extension }

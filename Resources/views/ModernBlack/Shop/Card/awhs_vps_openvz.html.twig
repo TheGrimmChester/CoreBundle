@@ -1,0 +1,36 @@
+{% if settings == '' %}
+    <div class="alert alert-warning" role="alert">
+        <strong>Attention!</strong> Aucune configuration n'est fourni.
+    </div>
+{% else %}
+    {% macro bytesToSize(bytes) %}
+        {% spaceless %}
+            {% set kilobyte = 1024 %}
+            {% set megabyte = kilobyte * 1024 %}
+            {% set gigabyte = megabyte * 1024 %}
+            {% set terabyte = gigabyte * 1024 %}
+            {% if bytes < kilobyte %}
+                {{ bytes ~ ' B' }}
+            {% elseif bytes < megabyte %}
+                {{ (bytes / kilobyte)|number_format(2, '.') ~ ' KB' }}
+            {% elseif bytes < gigabyte %}
+                {{ (bytes / megabyte)|number_format(2, '.') ~ ' MB' }}
+            {% elseif bytes < terabyte %}
+                {{ (bytes / gigabyte)|number_format(2, '.') ~ ' GB' }}
+            {% else %}
+                {{ (bytes / terabyte)|number_format(2, '.') ~ ' TB' }}
+            {% endif %}
+        {% endspaceless %}
+    {% endmacro %}
+    {#{{ dump(settings) }}#}
+    <ul>
+        {% if settings.core is defined %}
+            <li>Type : {{ settings.type.label|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+        {% if settings.core is defined %}
+            <li>Core : {{ settings.core.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
+        {% if settings.ram is defined %}
+            <li>Mémoire RAM : {{ _self.bytesToSize(settings.ram.value*1024*1024) }}</li>{% endif %}
+        {% if settings.disk_space is defined %}
+            <li>Espace disque : {{ _self.bytesToSize(settings.disk_space.value*1024*1024*1024) }}</li>{% endif %}
+    </ul>
+{% endif %}

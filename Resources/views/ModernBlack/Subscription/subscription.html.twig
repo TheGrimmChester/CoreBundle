@@ -1,0 +1,205 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - Souscription #{{ subscription.active }}{% endblock %}
+
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+{% block sidebarMenuDashboardActive %} active{% endblock %}
+
+{% block extendCss %}
+    <style>
+        tr th {
+            text-align: center;
+        }
+
+        tr td {
+            text-align: center;
+        }
+
+        table {
+            margin-bottom: 0
+        }
+
+        thead {
+            color: black;
+            font-weight: bold;
+            background: none;
+            background-image: none;
+            background-color: none;
+        }
+    </style>
+{% endblock %}
+{% block fastNavigation %}
+    <ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">Vous êtes ici:</div>
+    <li><a href="{{ path('awhs_core_subscriptions') }}">Souscriptions</a></li>
+    <li class="active"><a href="{{ path('awhs_core_subscription', { subscription_id: subscription.id}) }}">Souscription
+            #{{ subscription.active }}</a></li>
+    </ul>{% endblock %}
+
+{% block pageHeader %}
+    <div class="page-header">
+        <div class="row">
+            <!-- Page header, center on small screens -->
+            <h1 class="col-xs-12 col-sm-4 text-center text-left-sm"><i class="fa fa-dashboard page-header-icon"></i>&nbsp;&nbsp;{{ subscription.subscriptionPackage.name }}
+            </h1>
+
+            <div class="col-xs-12 col-sm-8">
+                <div class="row">
+                    <hr class="visible-xs no-grid-gutter-h">
+                    <!-- "Create project" button, width=auto on desktops -->
+                    <div class="pull-right col-xs-12 col-sm-auto"><a
+                                href="{{ path('awhs_core_subscription_renew_step_0', { subscription_id: subscription.id }) }}"
+                                class="btn btn-primary btn-primary-shaddow btn-labeled" style="width: 100%;"><span
+                                    class="btn-label icon fa fa-refresh"></span>Renouveler</a></div>
+
+                    <!-- Margin -->
+                    <div class="visible-xs clearfix form-group-margin"></div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- / .page-header -->{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Début souscription</th>
+                            <th>Fin souscription</th>
+                            <th>Statut</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="col-md-4">
+                                {% if subscription.startDate|date("Y") > 0 %}{{ subscription.startDate|date("d/m/Y \\à H:i") }}{% endif %}
+                            </td>
+                            <td class="col-md-4">
+                                {% if subscription.endDate|date("Y") > 0 %}{{ subscription.endDate|date("d/m/Y \\à H:i") }}{% endif %}
+                            </td>
+                            <td class="col-md-4">
+                                {% if (subscription.startDate is null) and (subscription.active == 0) %}
+                                    <span class="label label-danger">En attente de paiement</span>
+                                {% elseif (subscription.startDate is not null and subscription.endDate is null) and (subscription.active == 0) %}
+                                    <span class="label label-warning">En attente de traitement</span>
+                                {% elseif (subscription.startDate is not null and subscription.endDate is not null) and (subscription.active == 0) %}
+                                    <span class="label label-danger">Inactive</span>
+                                {% elseif subscription.active == 1 %}
+                                    {% if "now"| date("Y-m-d H:i:s") > subscription.endDate|date("Y-m-d H:i:s") %}
+                                        <span class="label label-danger">Expirée</span>{% endif %}
+                                    {% if "now"| date("Y-m-d H:i:s") < subscription.endDate|date("Y-m-d H:i:s") %}
+                                        <span class="label label-success">Active</span>{% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Produits</h3>
+                </div>
+                <div class="box-body table-responsive no-padding">
+
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th>Catégorie</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for subscriptionProduct in subscription.SubscriptionProducts %}
+                            <tr>
+                                <td class="col-md-4">{{ subscriptionProduct.product.name }}</td>
+                                <td class="col-md-4">{{ subscriptionProduct.product.category.name }}</td>
+                                <td class="col-md-4">
+                                    <table>
+                                        <tr>
+                                            {% if subscription.active == 1 %}
+                                                {% if subscriptionProduct.mappingId is not null %}
+                                                    {#<a href="{{ path(subscriptionProduct.product.category.prefix ~ '_aff', {'mapping_id': subscriptionProduct.mappingId}) }}"><img src="{{ asset('bundles/awhscore/img/awhs/find.png') }}" title="Afficher"></a>#}
+                                                    {% if is_granted('ROLE_ADMIN') %}
+                                                        <td>
+                                                            <a href="{{ path('awhs_core_admin_subscription_product', {'subscription_product_id': subscriptionProduct.id}) }}">
+                                                                <img style="width:22px"
+                                                                     src="{{ asset('images/icons/flat/svg/settings.svg') }}"
+                                                                     title="Modifier">
+                                                            </a>
+                                                        </td>
+                                                    {% endif %}
+                                                    <td>
+                                                        <a href="{{ path(subscriptionProduct.product.category.prefix ~ '_aff', {'id': subscriptionProduct.mappingId}) }}"><img
+                                                                    src="{{ asset('bundles/awhscore/img/awhs/find.png') }}"
+                                                                    title="Afficher"></a>
+                                                    </td>
+                                                {% else %}
+                                                    <span class="label label-warning">En attente de création</span>
+                                                {% endif %}
+                                            {% else %}
+                                                {% if subscriptionProduct.mappingId is null and subscriptionProduct.server is not null %}
+                                                    <span class="label label-danger">Supprimé</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div>
+        <div class="col-md-6">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Factures</h3>
+                </div>
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Date</th>
+                            <th>Statut</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for invoice in subscription.invoices %}
+                            <tr>
+                                <td>{{ invoice.id }}</td>
+                                {#<td>{{ invoice.date|date("d/m/Y \\à H:i") }}</td>#}
+                                <td>{{ invoice.date|date("d/m/Y") }}</td>
+                                <td>{% if invoice.textStatus == 'paid' %}<span
+                                            class="label label-success">Payée</span>{% elseif invoice.textStatus == 'unpaid' %}
+                                        <span class="label label-danger">Impayée</span>{% endif %}</td>
+                                <td class="col-md-4"><a
+                                            href="{{ path('awhs_core_invoice', { 'invoice_id': invoice.id }) }}"><img
+                                                src="{{ asset('bundles/awhscore/img/awhs/find.png') }}"
+                                                title="Afficher"></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div>
+    </div><!-- /.row -->
+{% endblock %}

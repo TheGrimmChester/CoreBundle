@@ -1,0 +1,86 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - Mes Services{% endblock %}
+
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+{% block sidebarMenuDashboardActive %} active{% endblock %}
+
+{% block fastNavigation %}{% endblock %}
+{% block pageHeader %}{% endblock %}
+
+{% block extendCss %}
+    <style>
+        tr th {
+            text-align: center;
+        }
+
+        tr td {
+            text-align: center;
+        }
+
+        table {
+            margin-bottom: 0
+        }
+
+        thead {
+            color: black;
+            font-weight: bold;
+            background: none;
+            background-image: none;
+            background-color: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Factures</h3>
+                </div>
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Numéro de facture</th>
+                            <th>Client</th>
+                            <th>Date de facturation</th>
+                            <th>Date d'échéance</th>
+                            <th>Total</th>
+                            <th>Statut</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for invoice in invoices %}
+                            <tr>
+                                <td>
+                                    <a href="{{ path('awhs_core_admin_invoice', { 'invoice_id': invoice.id }) }}">{{ invoice.date|date("Y-m-d") }}
+                                        -{{ invoice.id }}</a></td>
+                                <td>
+                                    <a href="{{ path('user_admin', {'user_id': invoice.user.id }) }}">{{ invoice.user.lastname ~ " " ~ invoice.user.firstname }}</a>
+                                </td>
+                                <td>{{ invoice.date|date("d/m/Y") }}</td>
+                                <td>{{ invoice.date|date("d/m/Y") }}</td>
+                                <td>{{ (invoice.details.subtotal+(invoice.details.subtotal*invoice.details.taxe))|number_format(2, '.', ',') }}
+                                    €
+                                </td>
+                                <td>{% if invoice.textStatus == 'paid' %}<span
+                                            class="label label-success">PAYÉE</span>{% elseif invoice.textStatus == 'unpaid' %}
+                                        <span class="label label-danger">IMPAYÉE</span>{% endif %}</td>
+                                <td><a href="{{ path('awhs_core_admin_invoice', { 'invoice_id': invoice.id }) }}">Afficher
+                                        la
+                                        facture{#<img src="{{ asset('bundles/awhscore/img/awhs/find.png') }}" title="Afficher">#}</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div>
+    </div><!-- /.row -->
+{% endblock %}

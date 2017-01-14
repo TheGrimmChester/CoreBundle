@@ -1,0 +1,175 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - Facture n°{{ invoice.id }}{% endblock %}
+
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+{% block sidebarMenuDashboardActive %} active{% endblock %}
+
+{% block fastNavigation %}{% endblock %}
+{% block pageHeader %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="invoice panel panel-default p-40">
+                <div class="panel-body p-t-0">
+                    <div class="row">
+                        <div class="col-md-12 align-center">
+                            <div class="col-md-8 align-center">
+                                <h4>Facture n°<span>{{ invoice.id }}</span></h4>
+                            </div>
+                            <div class="col-md-4 text-right">
+                                <h4>{% if invoice.textStatus == 'paid' %}<span
+                                            class="label label-success">Payée</span>{% elseif invoice.textStatus == 'unpaid' %}
+                                        <span class="label label-danger">Impayée</span>{% endif %}</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="pull-left">
+                                <h4 class="w-500 c-gray">De</h4>
+                                {#<img src="https://ns3.heberg.eu:4443/images/logo.png" class="img-responsive0" alt="themeforest">#}
+                                <address>
+                                    <strong><span class="width-300">Heberg.eu.</span></strong><br>
+                                    {#<span class="width-300">001 rue des lauriers</span><br>
+                                    <span class="width-300">Montréal, CA 94107</span><br>
+                                    <abbr title="Téléphone">T:</abbr> (000) 000-000 #}
+                                </address>
+                            </div>
+                            <div class="pull-right">
+                                <h4 class="w-500 c-gray">A</h4>
+                                {#<img src="assets/img/logo-light.png" class="img-responsive" alt="themeforest">#}
+                                <address>
+                                    <strong><span
+                                                class="width-300">{{ user.lastname }} {{ user.firstname }}</span></strong><br>
+                                    {#<span class="width-300">{{ user.address }}</span><br>#}
+                                    {#<span class="width-300">{{ user.city }}
+                                        , {{ user.province }} {{ user.zip }}</span><br>
+                                    <abbr title="Téléphone">T:</abbr> {{ user.phone }}#}
+                                </address>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 m-t-20 m-b-20">
+                                    <p><strong>Date de
+                                            facturation:</strong>&nbsp;<span>{{ invoice.date|date("d/m/Y") }}</span></p>
+                                    <p><strong>Échéance:</strong>&nbsp;<span>{{ invoice.date|date("d/m/Y") }}</span></p>
+
+                                </div>
+                            </div>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th style="width:65px" class="unseen text-center">QTE</th>
+                                    <th class="text-left">DESCRIPTION</th>
+                                    <th style="width:145px" class="text-right">UNITE</th>
+                                    <th style="width:95px" class="text-right">TOTAL</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {#{% for subscription in invoice.subscriptions %}
+                                    <tr class="item-row">
+                                        <td class="delete-wpr">
+                                            <span class="qty text-center">1</span>
+                                        </td>
+                                        <td>
+                                            <div class="text-primary"><strong><span>{{ subscription.subscriptionPackage.name }}</span></strong></div>
+                                            <ul>
+                                            {% for subscriptionProduct in subscription.SubscriptionProducts %}
+                                                <li><small class="width-100p">{{ subscriptionProduct.product.name }} ({{ subscriptionProduct.product.category.name }})</small></li>
+                                            {% endfor %}
+                                            </ul>
+                                        </td>
+                                        <td class="text-right cost">
+                                            <span>{{ subscription.subscriptionPackage.price|number_format(2, '.', ',') }}€</span>
+                                        </td>
+                                        <td class="text-right price">{{ subscription.subscriptionPackage.price|number_format(2, '.', ',') }}€</td>
+                                    </tr>
+                                {% endfor %}#}
+                                {% for package in invoice.details.packages %}
+                                    <tr class="item-row">
+                                        <td class="delete-wpr">
+                                            <span class="qty text-center">{{ package.quantity }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="text-primary"><strong><span>{{ package.name }}</span></strong>
+                                            </div>
+                                            <ul>
+                                                {% for product in package.products %}
+                                                    <li>
+                                                        <small class="width-100p">{{ product.name }}
+                                                            ({{ product.category }})
+                                                        </small>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td>
+                                        <td class="text-right cost">
+                                            <span>{{ package.price|number_format(2, '.', ',') }}€</span>
+                                        </td>
+                                        <td class="text-right price">{{ (package.price*package.quantity)|number_format(2, '.', ',') }}
+                                            €
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+                                <tr>
+                                    <td colspan="2" rowspan="5"></td>
+                                    <td class="text-right"><strong>Durée: </strong></td>
+                                    <td class="text-right">{{ invoice.details.duration }} mois</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right"><strong>Rabais</strong></td>
+                                    <td class="text-right" id="rebate">0.00€</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right"><strong>Sous-total</strong></td>
+                                    <td class="text-right"
+                                        id="subtotal">{{ invoice.details.subtotal|number_format(2, '.', ',') }}€
+                                    </td>
+                                </tr>
+                                {#<tr>
+                                    <td class="text-right no-border"><strong>Shipping</strong></td>
+                                    <td>
+                                        <span class="text-right" id="shipping">0.00€</span>
+                                    </td>
+                                </tr>#}
+                                <tr>
+                                    <td class="text-right no-border"><strong>Taxe</strong></td>
+                                    <td class="text-right">{{ invoice.details.taxe|number_format(2, '.', ',') }}€</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right no-border">
+                                        <div><strong>Total</strong></div>
+                                    </td>
+                                    <td class="text-right"
+                                        id="total">{{ (invoice.details.subtotal+(invoice.details.subtotal*invoice.details.taxe))|number_format(2, '.', ',') }}
+                                        €
+                                    </td>
+                                </tr>
+                                {% if invoice.textStatus == 'unpaid' %}
+                                    <tr>
+                                        <td colspan=4 class="text-right">
+                                            <button onclick="window.location='{{ path('awhs_core_invoice_pay', {'invoice_id': invoice.id}) }}'"
+                                                    class="btn btn-primary btn-primary-shaddow">Payer la facture
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                </tbody>
+                            </table>
+                            {#<div class="well">
+                                Thank you for your business. Please make sure all cheques payable to <strong>ThemeForest Web Services, Inc.</strong> Account No. 35757745
+                            </div>#}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- /.row -->
+{% endblock %}

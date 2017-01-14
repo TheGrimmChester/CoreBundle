@@ -1,0 +1,274 @@
+{% extends '::'~awhs.template~'/base_dashboard.html.twig' %}
+
+{% trans_default_domain "service" %}
+
+{% block title %} {{ app_name }} - Firewall{% endblock %}
+
+{% block fastNavigation %}
+    <ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">Vous êtes ici:</div>
+    <li><a href="{{ path('awhs_services_homepage') }}">Serveurs</a></li>
+    <li><a href="{{ path('awhs_services_homepage') }}">#1</a></li>
+    <li class="active"><a
+                href="{{ path('awhs_admin_server_dashboard', { server_hostname: server.reverse}) }}">Dashboard</a></li>
+    </ul>{% endblock %}
+
+{% block pageHeader %}{% endblock %}
+
+
+{% block extendCss %}
+    <style>.sidebarHr {
+            margin: 3px
+        }
+
+        ul {
+            padding-left: 20px;
+            word-wrap: break-word;
+        }</style>{% endblock %}
+{% macro bytesToSize(bytes) %}
+    {% spaceless %}
+        {% set kilobyte = 1024 %}
+        {% set megabyte = kilobyte * 1024 %}
+        {% set gigabyte = megabyte * 1024 %}
+        {% set terabyte = gigabyte * 1024 %}
+        {% if bytes < kilobyte %}
+            {{ bytes ~ ' B' }}
+        {% elseif bytes < megabyte %}
+            {{ (bytes / kilobyte)|number_format(2, '.') ~ ' KB' }}
+        {% elseif bytes < gigabyte %}
+            {{ (bytes / megabyte)|number_format(2, '.') ~ ' MB' }}
+        {% elseif bytes < terabyte %}
+            {{ (bytes / gigabyte)|number_format(2, '.') ~ ' GB' }}
+        {% else %}
+            {{ (bytes / terabyte)|number_format(2, '.') ~ ' TB' }}
+        {% endif %}
+    {% endspaceless %}
+{% endmacro %}
+{% block menu_user_money %}{{ client.money }}{% endblock %}
+{% block menu_user_lastip %}{{ client.lastip }}{% endblock %}
+
+{% block sidebarMenuMore %}{% include 'AWHSCoreBundle:'~awhs.template~'/Server:left_menu.html.twig' with {'server': server} %}{% endblock %}
+
+{% block content %}
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="#" data-toggle="modal" data-target="#importModal">Import</a></li>
+                    <li><a href="?export">Export</a></li>
+                    <li><a href="?add">Add new rule</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Select file for import</h4>
+                </div>
+                <form role="form" method="post" action="?import" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="file" name="file"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-primary" value="Import"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        {% for type,messages in flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type }}">{{ message }}</div>
+            {% endfor %}
+        {% endfor %}
+        {% if editDialogDisplayed %}
+            <form role="form"
+                  action="{{ path('awhs_admin_server_firewall', { 'server_hostname': server.reverse }) }}{{ editDialogAction }}"
+                  method="post">
+                <div class="form-group">
+                    <label for="table">Table</label>
+                    <select name="table" id="table" class="form-control">
+                        <option value="filter"{% if _get.table is defined and _get.table == 'filter' %} selected="selected"{% endif %}>
+                            filter
+                        </option>
+                        <option value="nat"{% if _get.table is defined and _get.table == 'nat' %} selected="selected"{% endif %}>
+                            nat
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="chain">Chain</label>
+                    <select name="chain" id="chain" class="form-control">
+                        <option value="INPUT"{% if _get.chain is defined and _get.chain == 'INPUT' %} selected="selected"{% endif %}>
+                            INPUT
+                        </option>
+                        <option value="FORWARD"{% if _get.chain is defined and _get.chain == 'FORWARD' %} selected="selected"{% endif %}>
+                            FORWARD
+                        </option>
+                        <option value="OUTPUT"{% if _get.chain is defined and _get.chain == 'OUTPUT' %} selected="selected"{% endif %}>
+                            OUTPUT
+                        </option>
+                        <option value="PREROUTING"{% if _get.chain is defined and _get.chain == 'PREROUTING' %} selected="selected"{% endif %}>
+                            PREROUTING
+                        </option>
+                        <option value="POSTROUTING"{% if _get.chain is defined and _get.chain == 'POSTROUTING' %} selected="selected"{% endif %}>
+                            POSTROUTING
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="in">Input interface</label>
+                    <select name="in" id="in" class="form-control">
+                        {% for interface in interfaces %}
+                            <option value="{{ interface.name }}"
+                                    {% if _get.in is defined and _get.in == interface.name %}selected="selected"{% endif %}>{{ interface.name }}</option>
+                        {% endfor %}</select>
+                </div>
+                <div class="form-group">
+                    <label for="out">Output interface</label>
+                    <select name="in" id="in" class="form-control">
+                        {% for interface in interfaces %}
+                            <option value="{{ interface.name }}"
+                                    {% if _get.out is defined and _get.out == interface.name %}selected="selected"{% endif %}>{{ interface.name }}</option>
+                        {% endfor %}</select>
+                </div>
+                <div class="form-group">
+                    <label for="source">Source IP (with mask, example: 192.168.0.1/24)</label>
+                    <input type="text" name="source" id="source" class="form-control"
+                           value="{% if _get.source is defined %}{{ _get.source }}{% endif %}"/>
+                </div>
+                <div class="form-group">
+                    <label for="destination">Destination IP (with mask, example: 192.168.0.1/24)</label>
+                    <input type="text" name="destination" id="destination" class="form-control"
+                           value="{% if _get.destination is defined %}{{ _get.destination }}{% endif %}"/>
+                </div>
+                <div class="form-group">
+                    <label for="protocol">Protocol</label>
+                    <select name="protocol" id="protocol" class="form-control">
+                        <option value=""></option>
+                        <option value="tcp"{% if _get.protocol is defined and _get.protocol == 'tcp' %} selected="selected"{% endif %}>
+                            tcp
+                        </option>
+                        <option value="udp"{% if _get.protocol is defined and _get.protocol == 'udp' %} selected="selected"{% endif %}>
+                            udp
+                        </option>
+                        <option value="icpm"{% if _get.protocol is defined and _get.protocol == 'icpm' %} selected="selected"{% endif %}>
+                            icpm
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dport">Destination port (or port range delimited by colon, example: 20:21)</label>
+                    <input type="text" name="dport" id="dport" class="form-control"
+                           value="{% if _get.dport is defined %}{{ _get.dport }}{% endif %}"/>
+                </div>
+                <div class="form-group">
+                    <label for="sport">Source port (or port range delimited by colon, example: 20:21)</label>
+                    <input type="text" name="sport" id="sport" class="form-control"
+                           value="{% if _get.sport is defined %}{{ _get.sport }}{% endif %}"/>
+                </div>
+                <div class="form-group">
+                    <label for="additional">Additional arguments (normal iptables parameters, see man iptables)</label>
+                    <input type="text" name="additional" id="additional" class="form-control"
+                           value="{% if _get.additional is defined %}{{ _get.additional }}{% endif %}"/>
+                </div>
+                <div class="form-group">
+                    <label for="target">Target</label>
+                    <select name="target" id="target" class="form-control">
+                        <option value="ACCEPT"{% if _get.target is defined and _get.target == 'ACCEPT' %} selected="selected"{% endif %}>
+                            ACCEPT
+                        </option>
+                        <option value="DROP"{% if _get.target is defined and _get.target == 'DROP' %} selected="selected"{% endif %}>
+                            DROP
+                        </option>
+                        <option value="REJECT"{% if _get.target is defined and _get.target == 'REJECT' %} selected="selected"{% endif %}>
+                            REJECT
+                        </option>
+                        <option value="DENY"{% if _get.target is defined and _get.target == 'DENY' %} selected="selected"{% endif %}>
+                            DENY
+                        </option>
+                        <option value="MASQUERADE"{% if _get.target is defined and _get.target == 'MASQUERADE' %} selected="selected"{% endif %}>
+                            MASQUERADE
+                        </option>
+                        <option value="REDIRECT"{% if _get.target is defined and _get.target == 'REDIRECT' %} selected="selected"{% endif %}>
+                            REDIRECT
+                        </option>
+                        <option value="DNAT"{% if _get.target is defined and _get.target == 'DNAT' %} selected="selected"{% endif %}>
+                            DNAT
+                        </option>
+                    </select>
+                </div>
+                <a href="{{ path('awhs_admin_server_firewall', { 'server_hostname': server.reverse }) }}"
+                   class="btn btn-default">Cancel</a>
+                <input type="submit" name="submit" value="Save" class="btn btn-primary"/>
+            </form>
+        {% else %}
+            {% for tableName,chains in iptables.getTables() %}
+                <div class="page-header">
+                    <h1>{{ tableName }}</h1>
+                </div>
+
+                {% for chainName,chain in chains %}
+                    <h4>
+                        {{ chainName }}
+                        <span class="label label-{% if chain.policy == 'ACCEPT' %}success{% else %}danger{% endif %}">
+								{{ chain.policy }}
+							</span>
+                    </h4>
+
+                    {% if chain.rules|length == 0 %}
+                        <p>No rules found.</p>
+                    {% else %}
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>In inf.</th>
+                                <th>Out inf.</th>
+                                <th>Source IP</th>
+                                <th>Dest. IP</th>
+                                <th>Protocol</th>
+                                <th>Additional params</th>
+                                <th>Target</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for rule in chain.rules %}
+                                <tr>
+                                    <td>{{ rule.in }}</td>
+                                    <td>{{ rule.out }}</td>
+                                    <td>{{ rule.source }}</td>
+                                    <td>{{ rule.destination }}</td>
+                                    <td>{{ rule.protocol }}</td>
+                                    <td>{{ rule.additional }}</td>
+                                    <td>
+												<span class="label label-{% if rule.target == 'ACCEPT' %}success{% else %}danger{% endif %}">
+													{{ rule.target }}
+												</span>
+                                    </td>
+                                    <td>
+                                        <a href="?edit&{{ iptables.buildQueryFromRule(rule, tableName, chainName) }}"
+                                           class="btn btn-sm btn-primary">Edit</a>
+
+                                        <a href="?remove&{{ iptables.buildQueryFromRule(rule, tableName, chainName) }}"
+                                           class="btn btn-sm btn-danger">Remove</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}

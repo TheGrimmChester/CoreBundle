@@ -1,0 +1,96 @@
+<li class="mm-dropdown">
+    <a href="{{ path('awhs_admin_servers') }}"><i class="menu-icon fa fa-server"></i><span
+                class="mm-text">Serveurs</span></a>
+    <ul>
+        <li class="mm-dropdown">
+            <a href="#"><span class="mm-text">{{ server.name }}</span></a>
+            <ul>
+                {#<li class="mm-dropdown">
+                    <a tabindex="-1" href="{{ path('awhs_admin_server', { server_hostname: server.reverse}) }}">Dashboard</a>
+                    <ul>
+                        <li class="mm-dropdown">
+                            <a href="#"><span class="mm-text">{{ server.name }}</span></a>
+                            <ul>
+                                <li><a tabindex="-1" href="{{ path('awhs_admin_server', { server_hostname: server.reverse}) }}">Accueil</a></li>
+                                <li><a tabindex="-1" href="{{ path('awhs_admin_server_ssh', { server_hostname: server.reverse}) }}">SSH</a></li>
+                                <li><a tabindex="-1" href="{{ path('awhs_admin_server_settings', { server_hostname: server.reverse}) }}">Paramètres</a></li>
+                                <li><a tabindex="-1" href="{{ path('awhs_admin_server_softwares', { server_hostname: server.reverse}) }}">Services</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>#}
+                <li><a tabindex="-1"
+                       href="{{ path('awhs_admin_server_dashboard', { server_hostname: server.reverse}) }}">Dashboard</a>
+                </li>
+                {#<li><a tabindex="-1" href="{{ path('awhs_admin_server_update', { server_hostname: server.reverse}) }}">Update</a></li>#}
+                {#<li><a tabindex="-1" href="{{ path('awhs_admin_server_awhspanel', { server_hostname: server.reverse}) }}">AWHSPanel</a></li>#}
+                <li><a tabindex="-1" href="{{ path('awhs_admin_server', { server_hostname: server.reverse}) }}">Informations</a>
+                </li>
+                <li><a tabindex="-1"
+                       href="{{ path('awhs_admin_server_settings', { server_hostname: server.reverse}) }}">Paramètres
+                        généraux</a></li>
+                <li><a tabindex="-1"
+                       href="{{ path('awhs_admin_server_firewall', { server_hostname: server.reverse}) }}">Firewall</a>
+                </li>
+                <li><a tabindex="-1" href="{{ path('awhs_admin_server_ssh', { server_hostname: server.reverse}) }}">Clé
+                        SSH</a></li>
+                <li class="mm-dropdown">
+                    <a tabindex="-1" href="#">Catégories de produits</a>
+                    <ul>
+                        <li><a tabindex="-1"
+                               href="{{ path('awhs_admin_server_categories', { server_hostname: server.reverse}) }}">Gérer</a>
+                        </li>
+                        <li><a tabindex="-1"
+                               href="{{ path('awhs_admin_server_category_add', { server_hostname: server.reverse}) }}">Ajouter</a>
+                        </li>
+                    </ul>
+                </li>
+                {% if bundle_exists('WebsiteBundle') %}
+                    {#<li><a tabindex="-1" href="{{ path('awhs_admin_server_softwares', { server_hostname: server.reverse}) }}">Services</a></li>#}
+                    <li class="mm-dropdown">
+                        <a href="#"><span class="mm-text">Templates</span></a>
+                        <ul>
+                            <li><a tabindex="-1"
+                                   href="{{ path('awhs_admin_template_vhost_primary', { server_hostname: server.reverse}) }}">Virtual
+                                    Host Primaire</a></li>
+                            <li><a tabindex="-1"
+                                   href="{{ path('awhs_admin_template_vhost_subdomain', { server_hostname: server.reverse}) }}">Virtual
+                                    Host Sous-domaine</a></li>
+                            <li><a tabindex="-1"
+                                   href="{{ path('awhs_admin_dns_zone_templates_show', { server_hostname: server.reverse}) }}">Zones
+                                    DNS</a></li>
+                        </ul>
+                    </li>
+                    <li><a tabindex="-1"
+                           href="{{ path('awhs_admin_server_zones', { server_hostname: server.reverse}) }}">Noms de
+                            domaines</a></li>
+                    <li class="mm-dropdown">
+                        <a href="#"><span class="mm-text">E-mails</span></a>
+                        <ul>
+                            <li><a tabindex="-1"
+                                   href="{{ path('awhs_admin_server_emails', { server_hostname: server.reverse}) }}">G&eacute;rer
+                                    les e-mails</a></li>
+                            <li><a tabindex="-1"
+                                   href="{{ path('awhs_admin_server_email_forwards', { server_hostname: server.reverse}) }}">Alias
+                                    et redirections</a></li>
+                        </ul>
+                    </li>
+                    <li class="mm-dropdown">
+                    <a href="#"><span class="mm-text">Bases de données</span></a>
+                    <ul>
+                        <li><a tabindex="-1"
+                               href="{{ path('awhs_admin_service_manage_databases', { server_hostname: server.reverse}) }}">Bases
+                                de donn&eacute;es</a></li>
+                        <li><a tabindex="-1"
+                               href="{{ path('awhs_admin_service_manage_database_users', { server_hostname: server.reverse}) }}">Utilisateurs</a>
+                        </li>
+                    </ul>
+                    </li>{% endif %}
+                <li><a tabindex="-1"
+                       href="{{ path('awhs_admin_server_packages', { server_hostname: server.reverse}) }}">Packages</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</li>
+
