@@ -102,7 +102,7 @@
                                             {% for subscriptionProduct in item.package.productsPackage %}
                                                 <tr class="item-row">
                                                     <td colspan=2>
-                                                        {% include  'AWHSCoreBundle:'~awhs.template~'/Cart/Configuration:' ~ subscriptionProduct.product.category.prefix ~ '.html.twig' with {'index_package': i-1, 'index': loop.index0, 'item': item, 'product': subscriptionProduct.product, 'settings': subscriptionProduct.product.settingsArray} %}
+                                                        {% include  subscriptionProduct.product.category.bundleName~':'~awhs.template~'/Cart/Configuration:' ~ subscriptionProduct.product.category.prefix ~ '.html.twig' with {'index_package': i-1, 'index': loop.index0, 'item': item, 'product': subscriptionProduct.product, 'settings': subscriptionProduct.product.settingsArray} %}
                                                     </td>
                                                 </tr>
                                             {% endfor %}

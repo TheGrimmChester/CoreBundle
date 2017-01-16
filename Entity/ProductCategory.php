@@ -82,6 +82,13 @@ class ProductCategory
     /**
      * @var string
      *
+     * @ORM\Column(name="bundle_nume", type="string", length=255)
+     */
+    private $bundle_name;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="settings", type="string", length=1000)
      */
     private $settings;
@@ -121,7 +128,7 @@ class ProductCategory
      * Set name
      *
      * @param string $name
-     * @return Subscription
+     * @return ProductCategory
      */
     public function setName($name)
     {
@@ -144,7 +151,7 @@ class ProductCategory
      * Set prefix
      *
      * @param string $prefix
-     * @return GroupService
+     * @return ProductCategory
      */
     public function setPrefix($prefix)
     {
@@ -167,7 +174,7 @@ class ProductCategory
      * Set api_name
      *
      * @param string $api_name
-     * @return GroupService
+     * @return ProductCategory
      */
     public function setApiName($api_name)
     {
@@ -200,6 +207,28 @@ class ProductCategory
     }
 
     /**
+     * Get bundle_name
+     *
+     * @return string
+     */
+    public function getBundleName()
+    {
+        return $this->bundle_name;
+    }
+
+    /**
+     * Set bundle_name
+     *
+     * @param string $bundle_name
+     * @return ProductCategory
+     */
+    public function setBundleName($bundle_name)
+    {
+        $this->bundle_name = $bundle_name;
+        return $this;
+    }
+
+    /**
      * Get settings
      *
      * @return string
@@ -223,9 +252,9 @@ class ProductCategory
     }
 
     /**
-     * Get settings
+     * Get settingsArray
      *
-     * @return string
+     * @return array
      */
     public function getSettingsArray()
     {

@@ -1,4 +1,0 @@
-<ul>
-    {% if settings.domain.max.value is defined %}
-        <li>Nom de domaine : {{ settings.domain.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
-</ul>

@@ -1,7 +1,0 @@
-<ul>
-    {% if settings.database.max.value is defined %}
-        <li>Base(s) de données : {{ settings.database.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
-    {% if settings.database_user.max.value is defined %}
-        <li>Utilisateur(s) SQL : {{ settings.database_user.max.value|replace({'-1': '&infin;'})|raw }}</li>{% endif %}
-    <li>Connexion à distance: Oui</li>
-</ul>
