@@ -34,7 +34,6 @@ use AWHS\CoreBundle\Entity\Invoice;
 use AWHS\CoreBundle\Entity\Subscription;
 use AWHS\CoreBundle\Entity\SubscriptionProduct;
 use AWHS\TaskBundle\Entity\Task;
-use AWHS\TaskBundle\Entity\TaskSubscription;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 

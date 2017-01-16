@@ -43,8 +43,8 @@ class SubscriptionCreateServicesCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('subscription:create:services')
-            ->setDescription('Cr�er les services');
+            ->setName('subscriptions:create:products')
+            ->setDescription('Créer les produits des souscriptions');
     }
 
     /**
@@ -65,7 +65,7 @@ class SubscriptionCreateServicesCommand extends ContainerAwareCommand
         foreach ($tasks as $task) {
 
             $taskSubscription = $em->createQuery("SELECT tt
-												FROM AWHSTaskBundle:TaskSubscription tt
+												FROM AWHSCoreBundle:Task\TaskSubscription tt
 												WHERE tt.task='{$task->getId()}'")->getSingleResult();
             $task->setLocked(1);
             $em->persist($task);

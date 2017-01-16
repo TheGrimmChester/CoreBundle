@@ -31,8 +31,8 @@
 namespace AWHS\CoreBundle\Controller;
 
 use Acme\PaymentBundle\Model\PaymentDetails;
+use AWHS\CoreBundle\Entity\Task\TaskSubscription;
 use AWHS\TaskBundle\Entity\Task;
-use AWHS\TaskBundle\Entity\TaskSubscription;
 use Payum\Core\Registry\RegistryInterface;
 use Payum\Core\Security\GenericTokenFactoryInterface;
 use Payum\Paypal\ExpressCheckout\Nvp\Api;
