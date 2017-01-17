@@ -50,4 +50,9 @@ class GitUtil implements GitInterface
     {
         return trim(exec("cd {$bundlePath} && git pull"));
     }
+
+    static function gitForceUpdate($bundlePath)
+    {
+        return trim(exec("cd {$bundlePath} && git reset --hard HEAD && git pull"));
+    }
 }

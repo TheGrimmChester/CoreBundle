@@ -35,6 +35,7 @@ use AWHS\CoreBundle\API\Local\GitUtil;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 
 class UpdateGitCommand extends ContainerAwareCommand
@@ -44,6 +45,12 @@ class UpdateGitCommand extends ContainerAwareCommand
         $this
             ->setName('bundles:update')
             ->setDescription('Check bundles update');
+        $this->addOption(
+            'force',
+            null,
+            InputOption::VALUE_NONE,
+            'Force git update'
+        );
     }
 
     /**
@@ -58,7 +65,7 @@ class UpdateGitCommand extends ContainerAwareCommand
         //Update the foundation of AWHSPanel
         $absoluteBasePath = realpath($this->getContainer()->get('kernel')->getRootDir() . "/../");
         $count = GitUtil::gitCountCommitsBehind($absoluteBasePath, "origin", "master");
-        if($count > 0){
+        if ($count > 0) {
             $output->writeln("<error>Foundation of AWHSPanel is {$count} commits behind.</error>");
             $output->writeln(GitUtil::gitUpdate($absoluteBasePath));
         }
@@ -67,12 +74,22 @@ class UpdateGitCommand extends ContainerAwareCommand
             if ($file->isDot()) continue;
 
             //Update all AWHS Bundles
-            if ($file->isDir()) {
+            if ($file->isDir()
+                && $file->getFilename() != "DDNSBundle"
+                && $file->getFilename() != "UrlShortenerBundle"
+                && $file->getFilename() != "VPSBundle"
+                && $file->getFilename() != "WakeBundle"
+                && $file->getFilename() != "WebsiteBundle"
+            ) {
                 $absolutePath = realpath($path . $file->getFilename());
                 $count = GitUtil::gitCountCommitsBehind($absolutePath, "origin", "master");
-                if($count > 0){
+                if ($count > 0) {
                     $output->writeln("<error>" . $file->getFilename() . " is {$count} commits behind.</error>");
-                    $output->writeln(GitUtil::gitUpdate($absolutePath));
+                    if ($input->getOption('force')) {
+                        $output->writeln(GitUtil::gitForceUpdate($absolutePath));
+                    } else {
+                        $output->writeln(GitUtil::gitUpdate($absolutePath));
+                    }
                 }
             }
         }
