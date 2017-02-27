@@ -33,6 +33,7 @@ namespace AWHS\CoreBundle\Controller;
 use AWHS\CoreBundle\Entity\Invoice;
 use AWHS\CoreBundle\Entity\Subscription;
 use AWHS\CoreBundle\Entity\SubscriptionProduct;
+use AWHS\CoreBundle\Entity\Task\TaskSubscription;
 use AWHS\TaskBundle\Entity\Task;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
